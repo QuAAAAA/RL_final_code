@@ -1,4 +1,4 @@
-\begin{thebibliography}{5}
+\begin{thebibliography}{4}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -28,11 +28,5 @@ Zhihao Du, Yuxuan Wang, Qian Chen, Xian Shi, Xiang Lv, Tianyu Zhao, Zhifu Gao, Y
 \newblock Cosyvoice 2: Scalable streaming speech synthesis with large language models.
 \newblock \emph{ArXiv}, abs/2412.10117, 2024.
 \newblock URL \url{https://api.semanticscholar.org/CorpusID:274762932}.
-
-\bibitem[Deng et~al.(2025)Deng, Zhou, Shu, Wang, and Wang]{Deng2025IndexTTSAI}
-Wei Deng, Siyi Zhou, Jingchen Shu, Jinchao Wang, and Lu~Wang.
-\newblock Indextts: An industrial-level controllable and efficient zero-shot text-to-speech system.
-\newblock \emph{ArXiv}, abs/2502.05512, 2025.
-\newblock URL \url{https://api.semanticscholar.org/CorpusID:276249228}.
 
 \end{thebibliography}

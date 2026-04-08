@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex proposal"] 1775614668.51096 "proposal.aux" "proposal.bbl" "proposal" 1775614668.80183 0
+["bibtex proposal"] 1775620289.89448 "proposal.aux" "proposal.bbl" "proposal" 1775620927.86073 0
   "./reference.bib" 1775527361.36786 3760 bdc35695a831d4f1c833ab79b302b108 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/natbib/unsrtnat.bst" 1233624470 24550 a41a6405f4de768c43e871d9fbce2bc8 ""
-  "proposal.aux" 1775614668.76196 5259 443328f077282e48fbe251db54564e05 "pdflatex"
+  "proposal.aux" 1775620927.82026 5555 afe44c2377ffeb32b9713b0922088b64 "pdflatex"
   (generated)
   "proposal.bbl"
   "proposal.blg"
   (rewritten before read)
-["pdflatex"] 1775614668.52081 "/srv/RL_project/repo/proposal/proposal.tex" "proposal.pdf" "proposal" 1775614668.80193 0
+["pdflatex"] 1775620927.57578 "/srv/RL_project/repo/proposal/proposal.tex" "proposal.pdf" "proposal" 1775620927.86083 0
   "/etc/texmf/web2c/texmf.cnf" 1773062606.20639 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/matt44/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0900.600pk" 1775614667.96997 17492 d4d17ab083d80d830ba9b71f6f5cd117 ""
   "/home/matt44/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk" 1775614668.16197 20008 a21113f19e5b8049ea76941d8a0dd8ee ""
@@ -41,6 +41,7 @@
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb" 1248133631 37912 77d683123f92148345f3fc36a38d9ab1 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb" 1248133631 36281 c355509802a035cadc5f15869451dcee ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb" 1248133631 35752 024fb6c41858982481f6968b5fc26508 ""
+  "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1248133631 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1248133631 32569 5e5ddc8df908dea60932f3c484a54c0d ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb" 1248133631 32716 08e384dc442464e7285e891af9f45947 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb" 1248133631 34694 ad62b13721ee8eda1dcc8993c8bd7041 ""
@@ -132,17 +133,17 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1773331718.37267 230484 b5ecf1e2279bd656c2c0037689af4d45 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1773331724 6898742 f29cf9cfc934ae712488d4bfc3a9de41 ""
-  "1-overview.tex" 1775407645.96416 3645 77a07d652b7639c13bba58ef710705fb ""
-  "2-formulation.tex" 1775313784.28932 2189 4bd454f611e6e47231379b153442771c ""
-  "3-evaluation.tex" 1775614667.13197 4369 0b505b535fad7e654524084c0f0040c9 ""
-  "4-method.tex" 1775571691.71194 2596 d29351e3cfed6f643fe0129bf7550bb1 ""
-  "5-exp.tex" 1775411028.00424 1532 4c3bde36a48c07e0393bf04c762eaa74 ""
+  "1-overview.tex" 1775617510.9873 4578 aeff378d731ffa7673ad1d97b3139be0 ""
+  "2-formulation.tex" 1775620145.74318 3291 fa214ce19ff042324c3f590c461ec9c2 ""
+  "3-evaluation.tex" 1775620289.38313 5949 d6f4e63d96a1c3fa0fa3c9948f633b80 ""
+  "4-method.tex" 1775620927.31826 4940 da2dc81553325d4948f28428a014b3b8 ""
+  "5-exp.tex" 1775620065.5282 1793 8c3c431dfee44f83d43a7775642826c7 ""
   "6-contribution.tex" 1775545319.38356 188 3db4597134893c46d4369d3f573cc02a ""
   "asset/architecture.pdf" 1775570794.00467 3667714 764503044bef18d6136d438291d46eb8 ""
   "neurips_2020.sty" 1775033843.22915 11309 0a12e5896af9b3e64d2bb3e796c5eb0a ""
-  "proposal.aux" 1775614668.76196 5259 443328f077282e48fbe251db54564e05 "pdflatex"
-  "proposal.bbl" 1775614668.51896 2432 21ab4dd2308ca02ac314c60dde3e83da "bibtex proposal"
-  "proposal.out" 1775614668.76196 2463 a6de5fc9a6723efa0f64ad70dbda0e2d "pdflatex"
+  "proposal.aux" 1775620927.82026 5555 afe44c2377ffeb32b9713b0922088b64 "pdflatex"
+  "proposal.bbl" 1775620289.90113 2072 75781e3d2f8be260bd9c44344e3e4e84 "bibtex proposal"
+  "proposal.out" 1775620927.82026 3048 f75a46ba1344dfce4c827d08386fb0cb "pdflatex"
   "proposal.tex" 1775545383.79335 2590 e4b360e2505687431bc5c51d9497ca5a ""
   (generated)
   "proposal.aux"

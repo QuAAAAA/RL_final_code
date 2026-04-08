@@ -1,27 +1,39 @@
 \section{Methodology}
 \label{section:algorithm}
 
-Our methodology introduces an RL-based fine-tuning stage integrated into the pre-trained IndexTTS2 architecture. The core idea is to treat the autoregressive generation of speech representations as a sequential decision-making process. By defining task-specific rewards based on emotional expressiveness (Valence-Arousal) and prosody (emphasis), we guide the model to retain and awaken its emotional capabilities when adapting to low-resource languages.
+Our methodology follows a two-stage framework built upon a pre-trained expressive IndexTTS2 model. Starting from a model trained on a high-resource language, we first adapt it to the low-resource target language, and then apply reinforcement learning to preserve and recover emotional expressiveness, prosodic control, and content accuracy during transfer.
+
+\subsection{Stage 1: Low-Resource Language Adaptation}
+In the first stage, we adapt the expressive base model to the low-resource target language. The goal of this stage is to acquire target-language pronunciation and linguistic patterns while preserving as much of the pretrained expressive prior as possible. To reduce severe catastrophic forgetting, we adopt a parameter-efficient adaptation strategy, such as lightweight adapter modules or LoRA, so that only a limited subset of model parameters is updated during target-language transfer.
+
+\subsection{Stage 2: RL-Based Emotional Realignment}
+In the second stage, we introduce an RL-based alignment procedure on top of the adapted model. The core idea is to treat the autoregressive generation of semantic speech representations as a sequential decision-making process, while computing task-specific rewards from the decoded speech waveform. This stage explicitly optimizes emotion preservation, emotional intensity, local emphasis, and content intelligibility in the low-resource language. In practice, the RL updates are mainly applied to the autoregressive T2S transformer, and can optionally include the emotion- or style-related conditioning modules when stronger expressive realignment is needed.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\linewidth]{asset/architecture.pdf}
-    \caption{High-level architecture of the proposed RL-enhanced IndexTTS2 framework. The generator outputs acoustic tokens, which are first decoded into speech waveforms before being evaluated by the emotion and emphasis reward models. These rewards are used to update the policy via Group Relative Policy Optimization (GRPO), mitigating catastrophic forgetting.}
+    \caption{High-level architecture of the proposed RL-enhanced IndexTTS2 framework. After low-resource adaptation, the generator outputs semantic speech tokens, which are decoded into speech waveforms and evaluated by emotion, prosody, and content reward models. These rewards are used to update the policy via Group Relative Policy Optimization (GRPO), mitigating emotional forgetting during language transfer.}
     \label{fig:architecture}
 \end{figure}
 
 \subsection{Reinforcement Learning Formulation}
-The generation of acoustic tokens is formulated as a Markov Decision Process (MDP):
+The generation of semantic speech tokens is formulated as a Markov Decision Process (MDP), while the reward is computed from the decoded speech waveform:
 \begin{itemize}
     \item \textbf{State ($S_t$):} The hidden states of the IndexTTS2 autoregressive decoder, incorporating the input text, speaker conditions, and previously generated speech tokens up to step $t$.
-    \item \textbf{Action ($A_t$):} The predicted acoustic token at step $t$, sampled from the policy distribution $\pi_\theta(A_t|S_t)$.
-    \item \textbf{Reward ($R_t$):} A composite reward signal provided upon the completion of a sequence or segment. The reward comprises two main components:
+    \item \textbf{Action ($A_t$):} The predicted semantic speech token at step $t$, sampled from the policy distribution $\pi_\theta(A_t|S_t)$.
+    \item \textbf{Reward ($R_t$):} A composite reward signal provided upon the completion of a sequence or segment. The reward is designed to preserve emotional expressiveness while maintaining intelligibility in the low-resource target language, and comprises four components:
     \begin{enumerate}
-        \item \textit{Emotion Alignment Reward:} Evaluated using a pre-trained emotion recognition model (e.g., emotion2vec) to measure the alignment between the target Valence-Arousal (VA) state and the generated speech.
-        \item \textit{Prosody and Emphasis Reward:} A penalty or bonus based on the correct placement of stress and natural rhythm.
+        \item \textit{Emotion Classification Reward:} Evaluated using a pre-trained emotion recognition model (e.g., emotion2vec) to measure whether the generated speech matches the target emotion category.
+        \item \textit{Global Emotion Intensity Reward:} Computed from the distance between the generated speech and a neutral centroid in the Valence-Arousal-Dominance (VAD) space, in order to encourage the target global emotional intensity.
+        \item \textit{Local Emphasis Control Reward:} A reward based on the relative pitch and energy patterns of emphasized words, which encourages correct placement of local stress and expressive prosody.
+        \item \textit{ASR-Based Content Reward:} Computed using an ASR model on the generated speech to compare the transcription against the input text, encouraging content preservation and intelligibility during RL optimization.
     \end{enumerate}
 \end{itemize}
+In summary, the sequence-level reward can be written as
+\[
+R = \lambda_1 R_{\text{emo-cls}} + \lambda_2 R_{\text{intensity}} + \lambda_3 R_{\text{emphasis}} + \lambda_4 R_{\text{ASR}},
+\]
+where the coefficients $\lambda_i$ control the trade-off between emotional expressiveness, local prosody, and content accuracy.
 
 \subsection{Alleviating Catastrophic Forgetting}
-To address the degradation of emotional capabilities during low-resource fine-tuning, we initialize our policy $\pi_\theta$ with the weights of the high-resource pre-trained IndexTTS2. We employ Group Relative Policy Optimization (GRPO) mixed with a Kullback-Leibler (KL) divergence penalty against the original pre-trained reference model. This ensures that the model explores localized linguistic adaptations while strictly preserving the high-level emotional generation prior.
-
+To address the degradation of emotional capabilities during low-resource fine-tuning, we initialize our policy $\pi_\theta$ with the weights of the target-language adapted IndexTTS2 model rather than training from scratch. We then employ Group Relative Policy Optimization (GRPO) mixed with a Kullback-Leibler (KL) divergence penalty against the adapted reference model. This ensures that the model explores localized emotional and prosodic improvements while preserving the linguistic adaptation and expressive prior inherited from the original high-resource model.
