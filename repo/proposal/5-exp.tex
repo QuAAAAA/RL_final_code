@@ -1,0 +1,24 @@
+\section{Experimental Results}
+\label{section:exp}
+
+\subsection{Experimental Setup}
+\label{section:exp:setup}
+To assess the synthesized speech, we conducted subjective evaluations using the Mean Opinion Score (MOS) on a scale from 1 to 5 (where 5 represents the best performance). The evaluation panel consisted of 12 members from the SARC laboratory. The test corpus involved 20 sentences for evaluating speech intelligibility and naturalness, and an additional 10 sentences specifically for evaluating voice similarity. In total, the subjective evaluation yielded 600 rating samples (( 20 * 2 + 10 ) test items $\times$ 12 evaluators).
+
+\subsection{Evaluation of Baseline Methods}
+\label{section:exp:baseline}
+
+Table \ref{tab:taiwanese_mos} shows the subjective evaluation results of the baseline method, CosyVoice2, on Taiwanese TTS. The model achieves a similarity MOS of 4.16, an intelligibility MOS of 4.41, and a naturalness MOS of 4.37, resulting in an overall mean MOS of 4.31. These results indicate that CosyVoice2 performs well in generating high-quality Taiwanese TTS with good similarity, intelligibility, and naturalness.
+
+\begin{table}[htbp]
+\centering
+\caption{Subjective Evaluation (MOS) on Taiwanese TTS}
+\label{tab:taiwanese_mos}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Similarity MOS $\uparrow$} & \textbf{Intelligibility MOS $\uparrow$} & \textbf{Naturalness MOS $\uparrow$} & \textbf{Mean $\uparrow$} \\
+\midrule
+CosyVoice2 & 4.16 & 4.41 & 4.37 & 4.31 \\
+\bottomrule
+\end{tabular}
+\end{table}

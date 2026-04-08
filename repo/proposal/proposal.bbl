@@ -1,0 +1,38 @@
+\begin{thebibliography}{5}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Zhou et~al.(2025)Zhou, Zhou, He, Zhou, Wang, Deng, and Shu]{Zhou2025IndexTTS2AB}
+Siyi Zhou, Yiquan Zhou, Yi~He, Xun Zhou, Jinchao Wang, Wei Deng, and Jingchen Shu.
+\newblock Indextts2: A breakthrough in emotionally expressive and duration-controlled auto-regressive zero-shot text-to-speech.
+\newblock \emph{ArXiv}, abs/2506.21619, 2025.
+\newblock URL \url{https://api.semanticscholar.org/CorpusID:280010717}.
+
+\bibitem[Ma et~al.(2023)Ma, Zheng, Ye, Li, Gao, Zhang, and Chen]{Ma2023emotion2vecSP}
+Ziyang Ma, Zhisheng Zheng, Jiaxin Ye, Jinchao Li, Zhifu Gao, Shiliang Zhang, and Xie Chen.
+\newblock emotion2vec: Self-supervised pre-training for speech emotion representation.
+\newblock \emph{ArXiv}, abs/2312.15185, 2023.
+\newblock URL \url{https://api.semanticscholar.org/CorpusID:266551115}.
+
+\bibitem[Radford et~al.(2022)Radford, Kim, Xu, Brockman, McLeavey, and Sutskever]{Radford2022RobustSR}
+Alec Radford, Jong~Wook Kim, Tao Xu, Greg Brockman, Christine McLeavey, and Ilya Sutskever.
+\newblock Robust speech recognition via large-scale weak supervision.
+\newblock In \emph{International Conference on Machine Learning}, 2022.
+\newblock URL \url{https://api.semanticscholar.org/CorpusID:252923993}.
+
+\bibitem[Du et~al.(2024)Du, Wang, Chen, Shi, Lv, Zhao, Gao, Yang, Gao, Wang, Yu, Liu, Sheng, Gu, Deng, Wang, Zhang, Yan, and Zhou]{Du2024CosyVoice2S}
+Zhihao Du, Yuxuan Wang, Qian Chen, Xian Shi, Xiang Lv, Tianyu Zhao, Zhifu Gao, Yexin Yang, Changfeng Gao, Hui Wang, Fan Yu, Huadai Liu, Zhengyan Sheng, Yue Gu, Chong Deng, Wen Wang, Shiliang Zhang, Zhijie Yan, and Jing-Ru Zhou.
+\newblock Cosyvoice 2: Scalable streaming speech synthesis with large language models.
+\newblock \emph{ArXiv}, abs/2412.10117, 2024.
+\newblock URL \url{https://api.semanticscholar.org/CorpusID:274762932}.
+
+\bibitem[Deng et~al.(2025)Deng, Zhou, Shu, Wang, and Wang]{Deng2025IndexTTSAI}
+Wei Deng, Siyi Zhou, Jingchen Shu, Jinchao Wang, and Lu~Wang.
+\newblock Indextts: An industrial-level controllable and efficient zero-shot text-to-speech system.
+\newblock \emph{ArXiv}, abs/2502.05512, 2025.
+\newblock URL \url{https://api.semanticscholar.org/CorpusID:276249228}.
+
+\end{thebibliography}

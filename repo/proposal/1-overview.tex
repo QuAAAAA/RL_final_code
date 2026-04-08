@@ -1,0 +1,33 @@
+\section{Project Overview}
+\label{section:intro}
+
+\subsection{Profile}
+
+\paragraph{Track: 3. Application}
+
+\paragraph{Abstract and project goal:}
+We propose a novel reinforcement learning (RL) framework integrated with the IndexTTS2 architecture to enhance the emotional expressiveness of Text-to-Speech (TTS) systems\citep{Zhou2025IndexTTS2AB}. Traditional TTS models often suffer from catastrophic forgetting of emotional capabilities when fine-tuned on low-resource languages, leading to flat and inexpressive synthesized speech. Our method addresses this degradation by leveraging task-specific RL rewards to awaken and preserve the emotional expressiveness of low-resource speech models. By incorporating Valence-Arousal (VA) modeling and emphasis prediction, our approach ensures fine-grained emotional control. Ultimately, this project aims to deliver a robust, highly expressive TTS system capable of maintaining rich prosody and recovering emotion across diverse linguistic resources.
+
+\paragraph{TL;DR (``Too Long; Didn't Read"):}
+This project introduces an RL-based framework to recover and enhance fine-grained emotional expressiveness and prosodic control in low-resource TTS models, mitigating the issue of catastrophic forgetting.
+
+\subsection{Motivation}
+
+The demand for controllable, highly expressive speech generation is rapidly growing across various industries, including professional dubbing, news broadcasting, and gaming. While large-scale models demonstrate strong capabilities, maintaining these capabilities when adapting to new, data-scarce domains remains a critical hurdle.
+
+\begin{itemize}
+    \item \textbf{Why is the problem interesting?} 
+    Current industries require nuanced, human-like voice synthesis. However, aligning these high-resource models to low-resource languages without losing their inherent emotional expressiveness presents a unique intersection of transfer learning and sequential decision-making in RL.
+    
+    \item \textbf{Challenge 1: Emotion Forgetting After Fine-Tuning.} When high-resource speech models are fine-tuned on low-resource datasets, they typically experience catastrophic forgetting, resulting in a significant degradation of their prior emotional generation capabilities.
+    
+    \item \textbf{Challenge 2: Inability to Express Prosodic Rhythm.} Existing models struggle to accurately model the natural cadence, pauses, and pacing required for dynamic emotional expression.
+    
+    \item \textbf{Challenge 3: Inaccurate Emphasis and VA Prediction from Text.} It is inherently difficult for models to automatically and precisely infer local emphasis (stress positions) and continuous emotional intensity (Valence-Arousal variations) relying solely on textual input.
+    
+    \item \textbf{Why the problem remains open or unsolved?} 
+    Low-resource languages inherently lack the massive, emotionally annotated datasets required for traditional supervised learning to capture complex emotional distributions. Consequently, models cannot easily generalize emotional prosody to these languages. Relevant prior works attempting to address speech emotion and expressiveness include IndexTTS2 \citep{Zhou2025IndexTTS2AB}, IndexTTS2.5, CosyVoice3, emotion2vec \citep{Ma2023emotion2vecSP}, and various heterogeneous model ensemble techniques. 
+    
+    \item \textbf{State-of-the-Art (SOTA) Method:} 
+    Currently, IndexTTS2 stands as the state-of-the-art framework in this domain, offering a strong autoregressive foundation for zero-shot synthesis and feature decoupling \citep{Zhou2025IndexTTS2AB}, which we build upon to reawaken emotional capacities via RL.
+\end{itemize}
