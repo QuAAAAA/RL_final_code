@@ -7,12 +7,12 @@ Our methodology follows a two-stage framework built upon a pre-trained expressiv
 In the first stage, we adapt the expressive base model to the low-resource target language. The goal of this stage is to acquire target-language pronunciation and linguistic patterns while preserving as much of the pretrained expressive prior as possible. To reduce severe catastrophic forgetting, we adopt a parameter-efficient adaptation strategy, such as lightweight adapter modules or LoRA, so that only a limited subset of model parameters is updated during target-language transfer.
 
 \subsection{Stage 2: RL-Based Emotional Realignment}
-In the second stage, we introduce an RL-based alignment procedure on top of the adapted model. The core idea is to treat the autoregressive generation of semantic speech representations as a sequential decision-making process, while computing task-specific rewards from the decoded speech waveform. This stage explicitly optimizes emotion preservation, emotional intensity, local emphasis, and content intelligibility in the low-resource language. In practice, the RL updates are mainly applied to the autoregressive T2S transformer, and can optionally include the emotion- or style-related conditioning modules when stronger expressive realignment is needed.
+In the second stage, we introduce an RL-based alignment procedure~\citep{2025arXiv251005758L} on top of the adapted model. The core idea is to treat the autoregressive generation of semantic speech representations as a sequential decision-making process, while computing task-specific rewards from the decoded speech waveform. This stage explicitly optimizes emotion preservation, emotional intensity, local emphasis, and content intelligibility in the low-resource language. In practice, the RL updates are mainly applied to the autoregressive T2S transformer, and can optionally include the emotion- or style-related conditioning modules when stronger expressive realignment is needed.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\linewidth]{asset/architecture.pdf}
-    \caption{High-level architecture of the proposed RL-enhanced IndexTTS2 framework. After low-resource adaptation, the generator outputs semantic speech tokens, which are decoded into speech waveforms and evaluated by emotion, prosody, and content reward models. These rewards are used to update the policy via Group Relative Policy Optimization (GRPO), mitigating emotional forgetting during language transfer.}
+    \caption{High-level architecture of the proposed RL-enhanced IndexTTS2 framework. After low-resource adaptation, the generator outputs semantic speech tokens, which are decoded into speech waveforms and evaluated by emotion, intensity, prosody, and content reward models. These rewards are used to update the policy via Group Relative Policy Optimization (GRPO), mitigating emotional forgetting during language transfer.}
     \label{fig:architecture}
 \end{figure}
 

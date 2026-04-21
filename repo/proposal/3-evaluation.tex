@@ -7,7 +7,7 @@ We plan to adopt several key performance metrics to comprehensively assess speec
 \begin{itemize}
     \item \textbf{Objective Metrics}:
     \begin{itemize}
-        \item \textbf{Word Error Rate (WER)}: Evaluates speech intelligibility and articulation accuracy using ASR models like FunASR or Whisper \citep{Radford2022RobustSR}.
+        \item \textbf{Word Error Rate (WER)}: Evaluates speech intelligibility and articulation accuracy using ASR models like FunASR \citep{2025arXiv250912508A} or Whisper \citep{Radford2022RobustSR}.
         \item \textbf{Speaker Similarity (SS)}: Computed as the cosine similarity between speaker embeddings extracted from a pretrained speaker recognition model to ensure the timbre is maintained after low-resource adaptation and RL optimization.
         \item \textbf{Emotion Similarity (ES) / Accuracy}: Measured using the open-source emotion2vec model to objectively verify if the generated speech matches the target emotion category.
         \item \textbf{Emotion Retention Gap (ERG)}: Let $M$ denote an emotion-related metric such as Emotion Similarity or Emotion MOS. We define $\mathrm{ERG} = (M_{\text{base}} - M_{\text{adapt}}) / M_{\text{base}}$ to quantify the relative emotional degradation after low-resource adaptation, and additionally report the recovery ratio $(M_{\text{ours}} - M_{\text{adapt}}) / (M_{\text{base}} - M_{\text{adapt}})$ to measure how much of the lost emotional capability is restored by our method.
@@ -24,11 +24,11 @@ The combination of EIT and EAT is crucial as our RL method explicitly optimizes 
 \subsection{Baseline Methods}
 We compare our method against several baselines to explicitly quantify emotional forgetting and emotional recovery during low-resource adaptation.
 \begin{itemize}
-    \item \textbf{Original High-Resource IndexTTS2}: The expressive source model before low-resource adaptation, used to establish the upper bound of emotional capability prior to transfer.
+    \item \textbf{Original High-Resource IndexTTS2} \citep{Zhou2025IndexTTS2AB}: The expressive source model before low-resource adaptation, used to establish the upper bound of emotional capability prior to transfer.
     \item \textbf{IndexTTS2 + Naive Low-Resource Fine-Tuning}: A baseline that fine-tunes IndexTTS2 on limited target-language data without any explicit preservation mechanism, used to measure the severity of emotional forgetting.
     \item \textbf{IndexTTS2 + Parameter-Efficient Adaptation}: A target-language adaptation baseline using a lightweight adaptation strategy, used to test whether preserving more pretrained parameters helps retain emotional expressiveness.
     \item \textbf{IndexTTS2 + Parameter-Efficient Adaptation + RL (Ours)}: Our full method, which applies RL-based emotional and prosodic alignment after low-resource adaptation.
-    \item \textbf{CosyVoice2} \citep{Du2024CosyVoice2S}: A strong zero-shot text-to-speech baseline with predefined emotion instructions for cross-model comparison.
+    \item \textbf{CosyVoice3} \citep{2025arXiv250517589D}: A strong zero-shot text-to-speech baseline with predefined emotion instructions for cross-model comparison.
     % \item \textbf{MaskGCT} \citep{Wang2024MaskGCTZT}: A zero-shot text-to-speech model utilizing a masked generative codec transformer for non-autoregressive synthesis.
     % \item \textbf{F5-TTS} \citep{Chen2024F5TTSAF}: A flow-matching based non-autoregressive TTS model known for fluent and faithful speech generation.
     % \item \textbf{Spark-TTS} \citep{Wang2025SparkTTSAE}: An efficient LLM-based TTS model that utilizes single-stream decoupled speech tokens.
@@ -38,9 +38,10 @@ We compare our method against several baselines to explicitly quantify emotional
 \subsection{Benchmark Tasks or Datasets}
 To simulate the low-resource fine-tuning scenario and evaluate catastrophic forgetting of emotions, we utilize the following datasets:
 \begin{itemize}
-    \item \textbf{High-Resource Pre-training Data}: The expressive base model is first trained on large-scale high-resource speech corpora to establish strong semantic generation and emotional priors.
+    % \item \textbf{High-Resource Pre-training Data}: The expressive base model is first trained on large-scale high-resource speech corpora to establish strong semantic generation and emotional priors.
     \item \textbf{Emotion Supervision Data}: We utilize the Emotional Speech Database (ESD) and the Expresso dataset, which provide annotations for discrete emotions, continuous intensities, and emphasis.
+    \item \textbf{Taiwanese Across Taiwan Corpus (TAT\_MOE)} \citep{Liao2022TATMOE}: To strengthen low-resource Taiwanese adaptation and evaluation, we additionally include the NAER-hosted corpus from the Ministry of Education project. It contains approximately 300k words of native Taiwanese texts (57 authors, about 6,000 characters each) and about 208 hours of parallel recordings (roughly 400 speakers, 4--6 speakers per sentence, recorded with 6 microphones). Depending on experimental needs, we will use either the full set (103GB), single-lavalier subset (17GB), or NAER-curated text-only files (2.2MB).
     \item \textbf{Low-Resource Adaptation Task}: We construct a target-language adaptation task by taking a small subset (e.g., 1 to 5 hours) of a low-resource language corpus. In our study, this setting is instantiated with Chinese as the high-resource source language and Taiwanese as the low-resource target language.
     \item \textbf{Evaluation Protocol}: We evaluate the model at three stages: before adaptation, after naive or parameter-efficient adaptation, and after RL optimization. This protocol allows us to directly measure emotional forgetting, emotional recovery, and trade-offs with intelligibility and speaker consistency.
-    \item \textbf{Standard Evaluation Sets}: For standard synthesis quality and stability testing, we additionally report metrics on benchmark sets such as SeedTTS test-zh, SeedTTS test-en, and LibriSpeech-test-clean when applicable.
+    % \item \textbf{Standard Evaluation Sets}: For standard synthesis quality and stability testing, we additionally report metrics on benchmark sets such as SeedTTS test-zh, SeedTTS test-en, and LibriSpeech-test-clean when applicable.
 \end{itemize}

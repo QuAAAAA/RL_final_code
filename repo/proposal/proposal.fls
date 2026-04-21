@@ -286,8 +286,8 @@ INPUT /usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmri8r.tfm
 INPUT proposal.aux
 INPUT ./proposal.out
 INPUT ./proposal.out
-INPUT /home/matt44/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0900.600pk
-INPUT /home/matt44/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk
+INPUT /home/black0000/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0900.600pk
+INPUT /home/black0000/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb
 INPUT /usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb
