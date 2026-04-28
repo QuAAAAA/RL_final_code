@@ -1,3 +1,7 @@
 /data/
 arc
 /logs/
+.venv/
+hf_cache/
+.claude/
+__pycache__/
