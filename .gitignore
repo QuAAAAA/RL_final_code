@@ -5,3 +5,10 @@ arc
 hf_cache/
 .claude/
 __pycache__/
+
+.pytest_cache/
+
+# dataset
+*wav
+TAT-Vol1/
+TAT-Vol2/

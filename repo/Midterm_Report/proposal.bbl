@@ -1,0 +1,108 @@
+\begin{thebibliography}{10}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Zhou et~al.(2025)Zhou, Zhou, He, Zhou, Wang, Deng, and
+  Shu]{Zhou2025IndexTTS2AB}
+Siyi Zhou, Yiquan Zhou, Yi~He, Xun Zhou, Jinchao Wang, Wei Deng, and Jingchen
+  Shu.
+\newblock Indextts2: A breakthrough in emotionally expressive and
+  duration-controlled auto-regressive zero-shot text-to-speech.
+\newblock \emph{ArXiv}, abs/2506.21619, 2025.
+\newblock URL \url{https://api.semanticscholar.org/CorpusID:280010717}.
+
+\bibitem[Chen et~al.(2025)Chen, Niu, Ma, Deng, Wang, JianZhao, Yu, and
+  Chen]{chen-etal-2025-f5}
+Yushen Chen, Zhikang Niu, Ziyang Ma, Keqi Deng, Chunhui Wang, JianZhao
+  JianZhao, Kai Yu, and Xie Chen.
+\newblock F5-{TTS}: A fairytaler that fakes fluent and faithful speech with
+  flow matching.
+\newblock In Wanxiang Che, Joyce Nabende, Ekaterina Shutova, and Mohammad~Taher
+  Pilehvar, editors, \emph{Proceedings of the 63rd Annual Meeting of the
+  Association for Computational Linguistics (Volume 1: Long Papers)}, pages
+  6255--6271, Vienna, Austria, July 2025. Association for Computational
+  Linguistics.
+\newblock ISBN 979-8-89176-251-0.
+\newblock \doi{10.18653/v1/2025.acl-long.313}.
+\newblock URL \url{https://aclanthology.org/2025.acl-long.313/}.
+
+\bibitem[Cho et~al.(2024)Cho, Oh, Kim, and Lee]{Cho2024EmoSphereEZ}
+Deok-Hyeon Cho, H.-S. Oh, Seung-Bin Kim, and Seong-Whan Lee.
+\newblock Emosphere++: Emotion-controllable zero-shot text-to-speech via
+  emotion-adaptive spherical vector.
+\newblock \emph{IEEE Transactions on Affective Computing}, 16:\penalty0
+  2365--2380, 2024.
+\newblock URL \url{https://api.semanticscholar.org/CorpusID:273821857}.
+
+\bibitem[{Li} et~al.(2026){Li}, {Zhou}, {Wang}, {Wang}, {Wu}, {Zhou}, {Zhou},
+  and {Shu}]{2026arXiv260103888L}
+Yunpei {Li}, Xun {Zhou}, Jinchao {Wang}, Lu~{Wang}, Yong {Wu}, Siyi {Zhou},
+  Yiquan {Zhou}, and Jingchen {Shu}.
+\newblock {IndexTTS 2.5 Technical Report}.
+\newblock \emph{arXiv e-prints}, art. arXiv:2601.03888, January 2026.
+\newblock \doi{10.48550/arXiv.2601.03888}.
+
+\bibitem[{Du} et~al.(2025){Du}, {Gao}, {Wang}, {Yu}, {Zhao}, {Wang}, {Lv},
+  {Wang}, {Ni}, {Shi}, {An}, {Yang}, {Li}, {Chen}, {Gao}, {Chen}, {Gu}, {Chen},
+  {Chen}, {Zhang}, {Wang}, and {Ye}]{2025arXiv250517589D}
+Zhihao {Du}, Changfeng {Gao}, Yuxuan {Wang}, Fan {Yu}, Tianyu {Zhao}, Hao
+  {Wang}, Xiang {Lv}, Hui {Wang}, Chongjia {Ni}, Xian {Shi}, Keyu {An}, Guanrou
+  {Yang}, Yabin {Li}, Yanni {Chen}, Zhifu {Gao}, Qian {Chen}, Yue {Gu}, Mengzhe
+  {Chen}, Yafeng {Chen}, Shiliang {Zhang}, Wen {Wang}, and Jieping {Ye}.
+\newblock {CosyVoice 3: Towards In-the-wild Speech Generation via Scaling-up
+  and Post-training}.
+\newblock \emph{arXiv e-prints}, art. arXiv:2505.17589, May 2025.
+\newblock \doi{10.48550/arXiv.2505.17589}.
+
+\bibitem[{Li} et~al.(2025){Li}, {Liu}, {Sun}, {Shi}, {Qu}, and
+  {Li}]{2025arXiv251005758L}
+Haoxun {Li}, Yu~{Liu}, Yuqing {Sun}, Hanlei {Shi}, Leyuan {Qu}, and Taihao
+  {Li}.
+\newblock {EMORL-TTS: Reinforcement Learning for Fine-Grained Emotion Control
+  in LLM-based TTS}.
+\newblock \emph{arXiv e-prints}, art. arXiv:2510.05758, October 2025.
+\newblock \doi{10.48550/arXiv.2510.05758}.
+
+\bibitem[{An} et~al.(2025){An}, {Chen}, {Chen}, {Deng}, {Du}, {Gao}, {Gao},
+  {Gong}, {Li}, {Li}, {Liu}, {Lv}, {Ji}, {Jiang}, {Ma}, {Luo}, {Ni}, {Pan},
+  {Peng}, {Peng}, {Wang}, {Wang}, {Wang}, {Wang}, {Wang}, {Wu}, {Tian}, {Tan},
+  {Yang}, {Yuan}, {Ye}, {Yu}, {Zhang}, {Zou}, {Zhao}, {Zhao}, {Zhou}, and
+  {Zhu}]{2025arXiv250912508A}
+Keyu {An}, Yanni {Chen}, Zhigao {Chen}, Chong {Deng}, Zhihao {Du}, Changfeng
+  {Gao}, Zhifu {Gao}, Bo~{Gong}, Xiangang {Li}, Yabin {Li}, Ying {Liu}, Xiang
+  {Lv}, Yunjie {Ji}, Yiheng {Jiang}, Bin {Ma}, Haoneng {Luo}, Chongjia {Ni},
+  Zexu {Pan}, Yiping {Peng}, Zhendong {Peng}, Peiyao {Wang}, Hao {Wang}, Haoxu
+  {Wang}, Wen {Wang}, Wupeng {Wang}, Yuzhong {Wu}, Biao {Tian}, Zhentao {Tan},
+  Nan {Yang}, Bin {Yuan}, Jieping {Ye}, Jixing {Yu}, Qinglin {Zhang}, Kun
+  {Zou}, Han {Zhao}, Shengkui {Zhao}, Jingren {Zhou}, and Yanqiao {Zhu}.
+\newblock {Fun-ASR Technical Report}.
+\newblock \emph{arXiv e-prints}, art. arXiv:2509.12508, September 2025.
+\newblock \doi{10.48550/arXiv.2509.12508}.
+
+\bibitem[Radford et~al.(2022)Radford, Kim, Xu, Brockman, McLeavey, and
+  Sutskever]{Radford2022RobustSR}
+Alec Radford, Jong~Wook Kim, Tao Xu, Greg Brockman, Christine McLeavey, and
+  Ilya Sutskever.
+\newblock Robust speech recognition via large-scale weak supervision.
+\newblock In \emph{International Conference on Machine Learning}, 2022.
+\newblock URL \url{https://api.semanticscholar.org/CorpusID:252923993}.
+
+\bibitem[Liao(2022)]{Liao2022TATMOE}
+Y.-F. Liao.
+\newblock Tat\_moe corpus [2022].
+\newblock Available online at https://tggl.naer.edu.tw, 2022.
+
+\bibitem[Du et~al.(2024)Du, Wang, Chen, Shi, Lv, Zhao, Gao, Yang, Gao, Wang,
+  Yu, Liu, Sheng, Gu, Deng, Wang, Zhang, Yan, and Zhou]{Du2024CosyVoice2S}
+Zhihao Du, Yuxuan Wang, Qian Chen, Xian Shi, Xiang Lv, Tianyu Zhao, Zhifu Gao,
+  Yexin Yang, Changfeng Gao, Hui Wang, Fan Yu, Huadai Liu, Zhengyan Sheng, Yue
+  Gu, Chong Deng, Wen Wang, Shiliang Zhang, Zhijie Yan, and Jing-Ru Zhou.
+\newblock Cosyvoice 2: Scalable streaming speech synthesis with large language
+  models.
+\newblock \emph{ArXiv}, abs/2412.10117, 2024.
+\newblock URL \url{https://api.semanticscholar.org/CorpusID:274762932}.
+
+\end{thebibliography}

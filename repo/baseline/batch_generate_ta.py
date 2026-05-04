@@ -6,6 +6,12 @@ python3 baseline/batch_generate_ta.py \
   --input baseline/text_origin \
   --output-root outputs/wav \
   --manifest outputs/manifest_ta.json
+
+Note:
+A2  耗時=07:57:48 (28668.6s)  生成音檔時長=07:53:41 (28421.5s)  failed=39
+A3  耗時=09:43:30 (35010.7s)  生成音檔時長=09:48:08 (35288.6s)  failed=5
+總耗時 : 17:41:19 (63679.3s)
+總生成音檔時長: 17:41:50 (63710.1s)
 """
 
 from __future__ import annotations

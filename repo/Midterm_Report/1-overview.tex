@@ -1,0 +1,33 @@
+\section{Project Overview}
+\label{section:intro}
+
+\subsection{Profile}
+
+\paragraph{Track: 3. Application}
+
+\paragraph{Abstract and project goal:}
+We address the problem of emotional capability loss when an expressive TTS model trained on a high-resource language is adapted to a low-resource language. Although the original model can generate emotionally expressive speech, its emotional controllability and prosodic richness often degrade after fine-tuning on limited target-language data. To tackle this issue, we propose an RL-enhanced adaptation framework built upon IndexTTS2 to preserve and realign emotional expressiveness during low-resource language transfer \citep{Zhou2025IndexTTS2AB}. Our method aims not to learn emotion from scratch, but to retain the emotional prior of the pretrained expressive model while improving emotion intensity, emphasis control, and speech naturalness in the low-resource language. In our study, we instantiate this setting using Chinese as the high-resource source language and Taiwanese as the low-resource target language.
+
+\paragraph{TL;DR (``Too Long; Didn't Read"):}
+This project studies how to preserve and recover the emotional expressiveness of an expressive TTS model when adapting it from a high-resource language to a low-resource language, using reinforcement learning to improve emotion retention and prosodic control.
+
+\subsection{Motivation}
+
+Expressive speech synthesis is increasingly important for applications such as dubbing, broadcasting, and interactive media. However, when a strong expressive TTS model trained on a high-resource language is adapted to a low-resource language, the model often retains intelligibility but loses emotional expressiveness and fine-grained prosodic control. This makes low-resource adaptation not only a language transfer problem, but also an emotion preservation and alignment problem.
+
+\begin{itemize}
+    \item \textbf{Why is the problem interesting?} 
+    This problem is interesting because it lies at the intersection of low-resource language adaptation, cross-lingual transfer, and controllable expressive speech synthesis. Rather than learning emotional speech generation from scratch, we focus on preserving and realigning the expressive capability that already exists in the pretrained TTS model when transferring it to a low-resource language.
+    
+    \item \textbf{Challenge 1: Emotional Forgetting During Low-Resource Adaptation.} When an emotionally expressive TTS model trained on a high-resource language is fine-tuned on limited low-resource language speech data, it often suffers from catastrophic forgetting, causing the synthesized speech to become flatter and less expressive.
+    
+    \item \textbf{Challenge 2: Loss of Fine-Grained Prosodic Control.} After low-resource adaptation, the model may still produce intelligible speech, but fail to preserve natural rhythm, pause structure, emphasis, and emotional intensity that are essential for expressive speech generation.
+    
+    \item \textbf{Challenge 3: Difficulty of Cross-Lingual Emotion Alignment.} Emotional cues and prosodic patterns do not transfer perfectly across languages. It is therefore difficult to preserve the expressive prior learned from a high-resource language and align it with the pronunciation, prosody, and linguistic structure of a low-resource language using only limited target-language data.
+    
+    \item \textbf{Why the problem remains open or unsolved?} 
+    This problem remains open because low-resource languages lack sufficient emotionally annotated speech data for conventional supervised training. As a result, naive fine-tuning often prioritizes pronunciation adaptation over expressive preservation. While seminal foundational models like F5-TTS \citep{chen-etal-2025-f5} achieve high fidelity, they still lack fine-grained emotional controllability. Conversely, works like EmoSphere++ \citep{Cho2024EmoSphereEZ} demonstrate strong emotion control but are primarily designed for high-resource scenarios. Extending these capabilities to low-resource languages without catastrophic forgetting remains highly challenging. Several prominent recent works have attempted to enhance expressiveness and language adaptability, including the IndexTTS2 \citep{Zhou2025IndexTTS2AB} and IndexTTS 2.5 \citep{2026arXiv260103888L} systems, CosyVoice 3 \citep{2025arXiv250517589D}, and EMORL \citep{2025arXiv251005758L}. Despite these advances, maintaining deep emotional controllability and prosodic richness during low-resource adaptation without losing the pretrained expressive prior is still an unsolved problem.
+    
+    \item \textbf{State-of-the-Art (SOTA) Method:} 
+    Currently, IndexTTS2 provides a strong foundation for zero-shot and controllable speech synthesis \citep{Zhou2025IndexTTS2AB}. In this project, we use it as the expressive base model and investigate how reinforcement learning can help preserve and realign its emotional capabilities during adaptation from a high-resource language to a low-resource language.
+\end{itemize}

@@ -1,4 +1,3 @@
-5.1
 [每個模型平均 Speaker Similarity]
 | Model | Evaluated | Avg SS | Missing | Errors |
 | --- | ---: | ---: | ---: | ---: |
