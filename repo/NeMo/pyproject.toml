@@ -1,0 +1,18 @@
+[project]
+name = "nemo-forced-aligner-local"
+version = "0.1.0"
+description = "Local uv environment for NeMo Forced Aligner."
+readme = "tools/nemo_forced_aligner/README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "nemo_toolkit[all]>=2.5.0",
+]
+
+[dependency-groups]
+dev = [
+    "prettyprinter>=0.18.0",
+    "pytest>=8.0.0",
+]
+
+[tool.uv]
+package = false

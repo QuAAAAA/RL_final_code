@@ -182,9 +182,66 @@ def summarize_by_model(rows):
     return summary
 
 
+EMOTION_COLUMNS = [
+    ("neutral", "Neutral", "neutral"),
+    ("angry", "Angry", "angry"),
+    ("happy", "Happy", "happy"),
+    ("sad", "Sad", "sad"),
+    ("surprised", "Surprise", "surprise"),
+    ("fearful", "Fear", "fear"),
+    ("disgusted", "Disgust", "disgust"),
+]
+
+
+def average_stats():
+    return {"count": 0, "wer_sum": 0.0}
+
+
+def summarize_by_model_emotion(rows):
+    stats = defaultdict(
+        lambda: {
+            "mean": average_stats(),
+            "emotions": defaultdict(average_stats),
+        }
+    )
+
+    for row in rows:
+        if row.get("status") != "ok":
+            continue
+
+        model_name = row.get("model", "")
+        emotion = row.get("emotion", "")
+        wer = float(row["wer"])
+
+        stats[model_name]["mean"]["count"] += 1
+        stats[model_name]["mean"]["wer_sum"] += wer
+
+        if emotion:
+            stats[model_name]["emotions"][emotion]["count"] += 1
+            stats[model_name]["emotions"][emotion]["wer_sum"] += wer
+
+    summary = {}
+    for model_name, item in sorted(stats.items()):
+        mean = item["mean"]
+        emotion_values = {}
+        for emotion_key, _, _ in EMOTION_COLUMNS:
+            emotion_stats = item["emotions"][emotion_key]
+            if emotion_stats["count"]:
+                emotion_values[emotion_key] = emotion_stats["wer_sum"] / emotion_stats["count"]
+            else:
+                emotion_values[emotion_key] = None
+
+        summary[model_name] = {
+            "mean": mean["wer_sum"] / mean["count"] if mean["count"] else None,
+            "emotions": emotion_values,
+        }
+    return summary
+
+
 CSV_FIELDS = [
     "index",
     "model",
+    "emotion",
     "file",
     "audio_path",
     "label",
@@ -200,6 +257,19 @@ CSV_FIELDS = [
     "language",
     "language_probability",
     "status",
+]
+
+
+SUMMARY_CSV_FIELDS = [
+    "model",
+    "mean",
+    "neutral",
+    "angry",
+    "happy",
+    "sad",
+    "surprise",
+    "fear",
+    "disgust",
 ]
 
 
@@ -230,6 +300,54 @@ def write_csv_rows(rows, output_path):
             writer.writerow({field: row.get(field, "") for field in CSV_FIELDS})
 
 
+def format_summary_value(value):
+    return "" if value is None else f"{value:.4f}"
+
+
+def summary_to_rows(by_model_emotion):
+    rows = []
+    for model_name, item in by_model_emotion.items():
+        row = {
+            "model": model_name,
+            "mean": format_summary_value(item["mean"]),
+        }
+        for emotion_key, _, csv_field in EMOTION_COLUMNS:
+            row[csv_field] = format_summary_value(item["emotions"][emotion_key])
+        rows.append(row)
+    return rows
+
+
+def format_summary_table(by_model_emotion):
+    lines = [
+        "[依情緒分類 WER]",
+        "| Model | Mean | Neutral | Angry | Happy | Sad | Surprise | Fear | Disgust |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for model_name, item in by_model_emotion.items():
+        values = [format_summary_value(item["mean"])]
+        values.extend(
+            format_summary_value(item["emotions"][emotion_key])
+            for emotion_key, _, _ in EMOTION_COLUMNS
+        )
+        lines.append(f"| {model_name} | {' | '.join(values)} |")
+    return "\n".join(lines) + "\n"
+
+
+def write_summary_output(result, output_path, output_format):
+    output_format = resolve_output_format(output_path, output_format)
+    output_path = ensure_output_parent(output_path)
+
+    if output_format == "csv":
+        with output_path.open("w", encoding="utf-8-sig", newline="") as file:
+            writer = csv.DictWriter(file, fieldnames=SUMMARY_CSV_FIELDS)
+            writer.writeheader()
+            writer.writerows(summary_to_rows(result["by_model_emotion"]))
+    else:
+        output_path.write_text(format_summary_table(result["by_model_emotion"]), encoding="utf-8")
+
+    return output_path, output_format
+
+
 def single_result_to_row(result):
     row = {
         "index": "",
@@ -247,17 +365,7 @@ def single_result_to_row(result):
 
 
 def format_manifest_report(result):
-    lines = [
-        "[每個模型平均 WER]",
-        "| Model | Evaluated | Avg WER | Corpus WER | Missing | Errors |",
-        "| --- | ---: | ---: | ---: | ---: | ---: |",
-    ]
-    for model_name, item in result["by_model"].items():
-        lines.append(
-            f"| {model_name} | {item['evaluated']} | {item['average_wer']:.4f} | "
-            f"{item['corpus_wer']:.4f} | {item['missing_audio']} | {item['errors']} |"
-        )
-
+    lines = format_summary_table(result["by_model_emotion"]).rstrip().splitlines()
     lines.extend(["", "[逐筆結果]"])
     for row in result["rows"]:
         lines.append(f"-- {row.get('model', '')} {row.get('file', '')}")
@@ -352,6 +460,7 @@ def transcribe_manifest(args):
         row = {
             "index": item.get("index", ""),
             "model": model_name,
+            "emotion": item.get("emotion", ""),
             "file": filename,
             "audio_path": str(audio_path) if audio_path else "",
             "label": label,
@@ -402,11 +511,13 @@ def transcribe_manifest(args):
             )
 
     summary = summarize_by_model(rows)
+    emotion_summary = summarize_by_model_emotion(rows)
     return {
         "manifest": str(Path(args.manifest).expanduser().resolve()),
         "model_path": str(model_path),
         "evaluated": sum(item["evaluated"] for item in summary.values()),
         "by_model": summary,
+        "by_model_emotion": emotion_summary,
         "rows": rows,
     }
 
@@ -427,11 +538,18 @@ def parse_args():
     parser.add_argument("--quiet", action="store_true", help="批次模式不逐筆列印")
     parser.add_argument("--json", action="store_true", help="用 JSON 格式輸出結果")
     parser.add_argument("--output", type=Path, default=None, help="將結果輸出到 .csv 或 .txt 檔案")
+    parser.add_argument("--summary-output", type=Path, default=None, help="批次模式將最後總覽另外輸出到 .csv 或 .txt 檔案")
     parser.add_argument(
         "--output-format",
         default="auto",
         choices=["auto", "csv", "txt"],
         help="輸出格式；auto 會依 --output 副檔名判斷",
+    )
+    parser.add_argument(
+        "--summary-output-format",
+        default="auto",
+        choices=["auto", "csv", "txt"],
+        help="總覽輸出格式；auto 會依 --summary-output 副檔名判斷",
     )
     return parser.parse_args()
 
@@ -444,19 +562,20 @@ def main():
         if args.output is not None:
             output_path, output_format = write_output(result, args.output, args.output_format)
             print(f"結果已輸出成 {output_format.upper()}：{output_path}", file=sys.stderr)
+        if args.summary_output is not None:
+            summary_path, summary_format = write_summary_output(
+                result,
+                args.summary_output,
+                args.summary_output_format,
+            )
+            print(f"總覽已輸出成 {summary_format.upper()}：{summary_path}", file=sys.stderr)
 
         if args.json:
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return
 
-        print("\n[每個模型平均 WER]")
-        print("| Model | Evaluated | Avg WER | Corpus WER | Missing | Errors |")
-        print("| --- | ---: | ---: | ---: | ---: | ---: |")
-        for model_name, item in result["by_model"].items():
-            print(
-                f"| {model_name} | {item['evaluated']} | {item['average_wer']:.4f} | "
-                f"{item['corpus_wer']:.4f} | {item['missing_audio']} | {item['errors']} |"
-            )
+        print()
+        print(format_summary_table(result["by_model_emotion"]), end="")
         return
 
     result = transcribe_audio(

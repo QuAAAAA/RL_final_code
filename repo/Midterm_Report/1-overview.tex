@@ -8,7 +8,7 @@
 \paragraph{Abstract and project goal:}
 We address the problem of emotional capability loss when an expressive TTS model trained on a high-resource language is adapted to a low-resource language. Although the original model can generate emotionally expressive speech, its emotional controllability and prosodic richness often degrade after fine-tuning on limited target-language data. To tackle this issue, we propose an RL-enhanced adaptation framework built upon IndexTTS2 to preserve and realign emotional expressiveness during low-resource language transfer \citep{Zhou2025IndexTTS2AB}. Our method aims not to learn emotion from scratch, but to retain the emotional prior of the pretrained expressive model while improving emotion intensity, emphasis control, and speech naturalness in the low-resource language. In our study, we instantiate this setting using Chinese as the high-resource source language and Taiwanese as the low-resource target language.
 
-\paragraph{TL;DR (``Too Long; Didn't Read"):}
+\paragraph{TL;DR:}
 This project studies how to preserve and recover the emotional expressiveness of an expressive TTS model when adapting it from a high-resource language to a low-resource language, using reinforcement learning to improve emotion retention and prosodic control.
 
 \subsection{Motivation}
