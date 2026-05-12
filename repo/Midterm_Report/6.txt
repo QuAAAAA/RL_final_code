@@ -1,2 +1,5 @@
 
 
+指定方向並設計base程式碼 draft proposal
+生成音檔 細修proposal
+擴展base程式碼 確保程式輕量且高效率  細修proposal

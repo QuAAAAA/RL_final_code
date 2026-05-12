@@ -16,6 +16,13 @@ import json
 from pathlib import Path
 
 
+def get_full_path(path, manifest_filepath):
+    path = Path(path).expanduser()
+    if path.is_absolute():
+        return str(path)
+    return str(Path(manifest_filepath).parent / path)
+
+
 def get_batch_starts_ends(manifest_filepath, batch_size):
     """
     Get the start and end ids of the lines we will use for each 'batch'.
