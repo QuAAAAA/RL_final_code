@@ -3,10 +3,13 @@
 Generates all texts in text_origin once with random emotions.
 Prints wall time and total audio duration at the end.
 
-python baseline/indexTTS_gen.py \
-  --input baseline/text_origin \
-  --output-root outputs/wav \
-  --manifest outputs/manifest_indextts.json
+cd /srv/RL_project/repo/index-tts
+uv run python ../baseline/indexTTS_gen.py \
+    --input ../baseline/text_origin \
+    --output-root ../outputs/wav_by_model/indextts \
+    --manifest ../outputs/manifest_indextts.json \
+    --index-tts-dir .
+
 
 Notes:
 IndexTTS，耗時: wall=01:56:45 (7005.6s)
@@ -27,6 +30,9 @@ import time
 import wave
 from pathlib import Path
 from typing import Dict, List, Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from trim_silence import trim_wav as trim_silence
 
 logging.disable(logging.WARNING)
 os.environ.setdefault("INDEXTTS_USE_DEEPSPEED", "0")
@@ -64,12 +70,14 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--temperature", type=float, default=0.8)
     p.add_argument("--num-beams", type=int, default=3)
     p.add_argument("--max-text-tokens", type=int, default=120)
-    p.add_argument("--max-mel-tokens", type=int, default=1500)
+    p.add_argument("--max-mel-tokens", type=int, default=1700)
     p.add_argument("--repetition-penalty", type=float, default=10.0)
     p.add_argument("--length-penalty", type=float, default=0.0)
     p.add_argument("--interval-silence", type=int, default=200)
     p.add_argument("--model-name", default="indextts", help="Short model name recorded in manifest and filenames.")
     p.add_argument("--manifest", default=None, help="Path to manifest JSON. Defaults to <output-root>/manifest.json.")
+    p.add_argument("--trim-top-db", type=float, default=30.0, help="Silence trim threshold in dB (default: 40).")
+    p.add_argument("--trim-pad-ms", type=int, default=50, help="Padding kept on each side after trim (default: 50ms).")
     return p.parse_args()
 
 
@@ -221,6 +229,11 @@ def main() -> None:
             print(f"[SKIP] {task['id']}")
             records.append({"index": i, "model": args.model_name, "text": task["text"], "emotion": task["emotion"], "file": out_path.name, "duration_sec": None})
             continue
+
+        try:
+            trim_silence(out_path, out_path, top_db=args.trim_top_db, pad_ms=args.trim_pad_ms)
+        except Exception as exc:
+            print(f"[WARN] trim failed for {task['id']}: {exc}")
 
         dur = get_wav_duration(out_path)
         total_audio_sec += dur

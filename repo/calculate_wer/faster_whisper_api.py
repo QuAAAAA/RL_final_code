@@ -13,6 +13,8 @@ try:
 except ImportError:
     tqdm = None
 
+from strip_tones import strip_tl_tones
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MODEL_PATH = PROJECT_ROOT / "models" / "faster-whisper-taigi-pinyin-large-v7"
@@ -22,14 +24,17 @@ DEFAULT_WAV_BY_MODEL_DIR = PROJECT_ROOT / "repo" / "outputs" / "wav_by_model"
 DEFAULT_LABEL = "tiong1-san1 tsing3-kong1 loo7-khau2."
 
 
-def normalize_text(text):
+def normalize_text(text, strip_tones=False):
+    text = str(text)
+    if strip_tones:
+        return strip_tl_tones(text)
     text = re.sub(r"[-.,!?]", " ", text)
     return " ".join(text.split())
 
 
-def calculate_wer(label, transcription):
-    label_clean = normalize_text(label)
-    transcription_clean = normalize_text(transcription) or " "
+def calculate_wer(label, transcription, strip_tones=False):
+    label_clean = normalize_text(label, strip_tones=strip_tones)
+    transcription_clean = normalize_text(transcription, strip_tones=strip_tones) or " "
     measures = jiwer.process_words(label_clean.lower(), transcription_clean.lower())
 
     return {
@@ -486,7 +491,7 @@ def transcribe_manifest(args):
                 whisper_model=whisper_model,
                 verbose=False,
             )
-            metrics = calculate_wer(label, result["transcription"])
+            metrics = calculate_wer(label, result["transcription"], strip_tones=args.strip_tones)
         except Exception as exc:
             row["status"] = f"error: {exc}"
             rows.append(row)
@@ -531,6 +536,7 @@ def parse_args():
     parser.add_argument("--beam-size", type=int, default=5, help="beam search 大小")
     parser.add_argument("--language", default="zh", help="Whisper language 參數")
     parser.add_argument("--label", default=None, help="提供答案標籤時會一併計算 WER")
+    parser.add_argument("--strip-tones", action="store_true", help="計算 WER 前先去除答案和辨識結果的所有數字音調")
     parser.add_argument("--manifest", type=Path, default=None, help="批次評估 manifest JSON，需包含 model/file/text 欄位")
     parser.add_argument("--wav-dir", type=Path, default=DEFAULT_WAV_DIR, help="manifest 批次模式的 wav 目錄")
     parser.add_argument("--wav-by-model-dir", type=Path, default=DEFAULT_WAV_BY_MODEL_DIR, help="manifest 批次模式的分模型 wav 目錄")
@@ -589,7 +595,7 @@ def main():
 
     if args.label is not None:
         result["label"] = args.label
-        result.update(calculate_wer(args.label, result["transcription"]))
+        result.update(calculate_wer(args.label, result["transcription"], strip_tones=args.strip_tones))
 
     if args.output is not None:
         output_path, output_format = write_output(result, args.output, args.output_format)

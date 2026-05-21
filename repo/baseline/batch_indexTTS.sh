@@ -22,11 +22,15 @@ OUTPUT_ROOT="${2:-$REPO_DIR/outputs/indextts}"
 
 # paths relative to INDEX_TTS_DIR (same defaults as run_inference.sh)
 SPEAKER="examples/prompts/FT0BAE.mp3"
-GPT_CKPT="trained_ckpts/tatmoe_run1/model_step202000.pth"
-TOKENIZER="checkpoints/bpe_extended.model"
+GPT_CKPT="/srv/RL_project/models/IndexTTS_trained/GPTs/trained_200hr_4e_step202000.pth"
+TOKENIZER="/srv/RL_project/models/IndexTTS_trained/checkpoints/bpe_extended.model"
 CONFIG="checkpoints/config.yaml"
 DEVICE="cuda:0"
 SEED=42
+
+# silence trimming (librosa.effects.trim)
+TRIM_TOP_DB=40       # below ref by this many dB = silence
+TRIM_PAD_MS=50       # keep this much padding on each side
 
 # ── emotion vectors [joy anger sadness fear disgust low_mood surprise calm] ──
 declare -A EMO_VECS
@@ -137,6 +141,11 @@ for i in "${!TASK_IDS[@]}"; do
         echo "[SKIP] $id"
         continue
     fi
+
+    # trim leading/trailing silence in place
+    "$UV" run python "$SCRIPT_DIR/trim_silence.py" "$out_path" \
+        --top-db "$TRIM_TOP_DB" --pad-ms "$TRIM_PAD_MS" >/dev/null || \
+        echo "[WARN] trim failed for $id"
 
     dur=$(wav_duration "$out_path")
     TOTAL_AUDIO=$(python3 -c "print($TOTAL_AUDIO + $dur)")
