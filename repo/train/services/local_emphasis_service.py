@@ -20,10 +20,12 @@ REWARD = LocalEmphasisReward()
 
 
 def _load_wav(path: str):
-    import torchaudio
+    import soundfile as sf
+    import torch
 
-    wav, sr = torchaudio.load(path)
-    return wav.mean(dim=0), sr
+    data, sr = sf.read(path, always_2d=True)  # [T, C]
+    wav = torch.from_numpy(data.T).float()    # [C, T]
+    return wav.mean(dim=0), int(sr)
 
 
 @app.route("/score")
