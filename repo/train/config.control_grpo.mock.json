@@ -1,0 +1,53 @@
+{
+  "run_name": "control-grpo-smoke",
+  "output_dir": "repo/train/runs/control-grpo-smoke",
+  "reward_weights": {
+    "emotion": 1.0,
+    "vad": 1.0,
+    "global_intensity": 0.25
+  },
+  "grpo": {
+    "group_size": 4,
+    "seed": 42,
+    "advantage_eps": 1e-06,
+    "clip_eps": 0.2,
+    "beta": 0.0
+  },
+  "control_grpo": {
+    "device": "cpu",
+    "feature_dim": 1024,
+    "hidden_dim": 64,
+    "va_bins": 9,
+    "epochs": 1,
+    "max_steps": 100,
+    "group_size": 4,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "max_grad_norm": 1.0,
+    "eval_size": 32,
+    "log_every": 10,
+    "eval_every": 50,
+    "seed": 42
+  },
+  "reward_options": {
+    "global_intensity": {
+      "mu_neutral": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "target_range": [
+        0.4,
+        0.6
+      ],
+      "sigma": 0.1,
+      "mock_dominance": 0.5
+    }
+  },
+  "wandb": {
+    "enabled": false,
+    "project": "rl-tts-grpo",
+    "name": "control-grpo-smoke",
+    "mode": "offline"
+  }
+}

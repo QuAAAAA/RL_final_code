@@ -1,0 +1,45 @@
+{
+  "run_name": "indextts-grpo-smoke",
+  "output_dir": "repo/train/runs/indextts-grpo-smoke",
+  "indextts_cfg": "repo/index-tts/checkpoints/config.yaml",
+  "indextts_model_dir": "repo/index-tts/checkpoints",
+  "gpt_checkpoint": "models/IndexTTS_trained/GPTs/trained_200hr_4e_step202000.pth",
+  "bpe_model": "models/IndexTTS_trained/checkpoints/bpe_extended.model",
+  "prompt_audio": "repo/w2v2-how-to/tests/000011_indextts_neutral.wav",
+  "data_path": "data/va_train/zho_restaurant_train_alltasks_tagged.jsonl",
+  "limit": 4,
+  "updates": 1,
+  "group_size": 2,
+  "max_mel_tokens": 128,
+  "top_k": 30,
+  "top_p": 0.8,
+  "temperature": 0.8,
+  "learning_rate": 1e-5,
+  "grpo": {
+    "clip_eps": 0.2,
+    "beta": 0.0
+  },
+  "services": {
+    "asqp":          { "mock": true },
+    "tts":           { "mock": true },
+    "asr":           { "mock": true },
+    "emotion":       { "mock": true },
+    "speaker":       { "mock": true },
+    "local_emphasis":{ "mock": true },
+    "vad":           { "mock": true }
+  },
+  "reward_options": {
+    "enabled_rewards": ["emotion", "vad", "global_intensity"],
+    "global_intensity": {
+      "mu_neutral": [0.5, 0.5, 0.5],
+      "target_range": [0.4, 0.6],
+      "sigma": 0.1,
+      "mock_dominance": 0.5
+    }
+  },
+  "reward_weights": {
+    "emotion": 1.0,
+    "vad": 1.0,
+    "global_intensity": 1.0
+  }
+}
