@@ -1,0 +1,153 @@
+2026-05-23 07:48:38,173 INFO W&B initialised: project=rl-tts-grpo run=indextts-grpo-run1
+2026-05-23 07:48:38,173 INFO Loading IndexTTS policy…
+2026-05-23 07:48:40,076 INFO We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+>> Adjusting GPT config vocab size from 12000 to 14001 based on checkpoint.
+>> GPT load missing keys: ['text_embedding.weight', 'text_head.weight', 'text_head.bias']
+>> Reshaping GPT parameter 'text_embedding.weight' from torch.Size([14001, 1280]) to torch.Size([14002, 1280])
+>> Reshaping GPT parameter 'text_head.weight' from torch.Size([14001, 1280]) to torch.Size([14002, 1280])
+>> Reshaping GPT parameter 'text_head.bias' from torch.Size([14001]) to torch.Size([14002])
+>> GPT weights restored from: /srv/RL_project/models/IndexTTS_trained/GPTs/trained_200hr_4e_step202000.pth
+>> DeepSpeed usage disabled via INDEXTTS_USE_DEEPSPEED=0
+2026-05-23 07:48:45,842 WARNING GPT2InferenceModel has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+W0523 07:48:46.354000 1890236 index-tts/.venv/lib/python3.10/site-packages/torch/utils/cpp_extension.py:2425] TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation.
+W0523 07:48:46.354000 1890236 index-tts/.venv/lib/python3.10/site-packages/torch/utils/cpp_extension.py:2425] If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'] to specific architectures.
+>> Failed to load custom CUDA kernel for BigVGAN. Falling back to torch.
+>> semantic_codec weights restored from: ./checkpoints/hf_cache/models--amphion--MaskGCT/snapshots/265c6cef07625665d0c28d2faafb1415562379dc/semantic_codec/model.safetensors
+cfm loaded
+length_regulator loaded
+gpt_layer loaded
+>> s2mel weights restored from: repo/index-tts/checkpoints/s2mel.pth
+>> campplus_model weights restored from: ./checkpoints/hf_cache/models--funasr--campplus/snapshots/fb71fe990cbf6031ae6987a2d76fe64f94377b7e/campplus_cn_common.bin
+Loading weights from nvidia/bigvgan_v2_22khz_80band_256x
+Removing weight norm...
+>> bigvgan weights restored from: nvidia/bigvgan_v2_22khz_80band_256x
+2026-05-23 07:48:50,508 WETEXT INFO found existing fst: /srv/RL_project/repo/index-tts/indextts/utils/tagger_cache/zh_tn_tagger.fst
+2026-05-23 07:48:50,508 INFO found existing fst: /srv/RL_project/repo/index-tts/indextts/utils/tagger_cache/zh_tn_tagger.fst
+2026-05-23 07:48:50,508 WETEXT INFO                     /srv/RL_project/repo/index-tts/indextts/utils/tagger_cache/zh_tn_verbalizer.fst
+2026-05-23 07:48:50,508 INFO                     /srv/RL_project/repo/index-tts/indextts/utils/tagger_cache/zh_tn_verbalizer.fst
+2026-05-23 07:48:50,508 WETEXT INFO skip building fst for zh_normalizer ...
+2026-05-23 07:48:50,508 INFO skip building fst for zh_normalizer ...
+2026-05-23 07:48:50,638 WETEXT INFO found existing fst: /srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/tn/en_tn_tagger.fst
+2026-05-23 07:48:50,638 INFO found existing fst: /srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/tn/en_tn_tagger.fst
+2026-05-23 07:48:50,638 WETEXT INFO                     /srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/tn/en_tn_verbalizer.fst
+2026-05-23 07:48:50,638 INFO                     /srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/tn/en_tn_verbalizer.fst
+2026-05-23 07:48:50,638 WETEXT INFO skip building fst for en_normalizer ...
+2026-05-23 07:48:50,638 INFO skip building fst for en_normalizer ...
+>> TextNormalizer loaded
+>> bpe model loaded from: /srv/RL_project/models/IndexTTS_trained/checkpoints/bpe_extended.model
+2026-05-23 07:48:51,070 INFO Reference model snapshot taken (frozen for KL).
+2026-05-23 07:48:51,070 INFO Policy loaded.
+2026-05-23 07:48:51,074 INFO Loaded 500 training examples.
+2026-05-23 07:48:51,075 INFO Starting GRPO training: 1 updates × 500 examples = 500 steps.
+2026-05-23 07:48:51,149 INFO ── Step 0 | uid=R0283:S003 | emotion=neutral | va_01=(0.375, 0.5) | tagged='"肉粿""沒有很焦脆"。' | translated='"bah4-kue2""bo5 tsiok4 tshau3-hue2-ta1--e5".'
+Use the specified emotion vector
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`...
+2026-05-23 07:48:56,691 INFO    rollout k=0 | codes_len=256
+2026-05-23 07:48:56,691 INFO    rollout k=1 | codes_len=256
+2026-05-23 07:48:56,691 INFO    rollout k=2 | codes_len=256
+2026-05-23 07:48:56,692 INFO    rollout k=3 | codes_len=256
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 51.41it/s]
+2026-05-23 07:48:57,262 INFO    k=0 | wav=repo/train/runs/indextts-grpo-run1/wav/step0000_k0.wav
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 54.73it/s]
+2026-05-23 07:48:57,792 INFO    k=1 | wav=repo/train/runs/indextts-grpo-run1/wav/step0000_k1.wav
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 54.74it/s]
+2026-05-23 07:48:58,322 INFO    k=2 | wav=repo/train/runs/indextts-grpo-run1/wav/step0000_k2.wav
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 54.74it/s]
+2026-05-23 07:48:58,852 INFO    k=3 | wav=repo/train/runs/indextts-grpo-run1/wav/step0000_k3.wav
+2026-05-23 07:49:08,076 WARNING _local_emphasis_reward: alignment failed (http://127.0.0.1:8108/align failed: 500 {"ok": false, "error": "No CTM output found in /tmp/tmpy9vxpafs/output\nNeMo stderr:\n  shuffle: false\n    num_workers: 8\n    pin_memory: true\n    use_start_end_token: false\n    \n[NeMo W 2026-05-23 07:49:06 dataloader:335] The following configuration keys are ignored by Lhotse dataloader: use_start_end_token\n[NeMo W 2026-05-23 07:49:06 dataloader:341] You are using a non-tarred dataset and requested tokenization during data sampling (pretokenize=True). This will cause the tokenization to happen in the main (GPU) process,possibly impacting the training speed if your tokenizer is very large.If the impact is noticable, set pretokenize=False in dataloader config.(note: that will disable token-per-second filtering and 2D bucketing features)\n\nTranscribing: 0it [00:00, ?it/s][NeMo W 2026-05-23 07:49:06 common:1198] CTC decoding strategy 'greedy' is slower than 'greedy_batch', which implements the same exact interface. Consider changing your strategy to 'greedy_batch' for a free performance improvement.\n\nTranscribing: 1it [00:00,  8.38it/s]\nTranscribing: 1it [00:00,  8.37it/s]\n", "type": "RuntimeError"}); skipping.
+2026-05-23 07:49:08,077 INFO    k=0 | reward=5.9616 | {'local_emphasis': 0.0, 'global_intensity': 0.0526, 'vad': 0.9352, 'emotion': 5.0}
+2026-05-23 07:49:18,136 INFO    k=1 | reward=0.0280 | {'local_emphasis': 0.1554, 'global_intensity': 0.0407, 'vad': 0.93, 'emotion': -1.0}
+2026-05-23 07:49:27,508 INFO    k=2 | reward=0.1313 | {'local_emphasis': 0.1585, 'global_intensity': 0.3639, 'vad': 0.8701, 'emotion': -1.0}
+2026-05-23 07:49:36,907 INFO    k=3 | reward=6.0884 | {'local_emphasis': 0.4713, 'global_intensity': 0.093, 'vad': 0.8062, 'emotion': 5.0}
+2026-05-23 07:49:36,909 INFO    rewards=[5.961561631411314, 0.027987263408405738, 0.13132130688041377, 6.08837970275122] | advantages=[0.9784837356187357, -1.0171878975932385, -0.9824329916103901, 1.0211371535848923]
+2026-05-23 07:49:37,191 INFO    loss=0.234325
+2026-05-23 07:49:40,375 INFO    checkpoint → repo/train/runs/indextts-grpo-run1/checkpoints/step_0000.pth
+2026-05-23 07:49:40,530 INFO ── Step 1 | uid=R0283:S004 | emotion=fear | va_01=(0.6662500000000001, 0.6508333333333334) | tagged='"肉粿"每一塊都"好脆""好恰""好喜歡"。' | translated='"bah4-kue2"mui2 tsit8 te3 long2"u7-kau3 tshe3""ho2 khap4""ts'
+Use the specified emotion vector
+2026-05-23 07:49:46,266 INFO    rollout k=0 | codes_len=256
+2026-05-23 07:49:46,267 INFO    rollout k=1 | codes_len=256
+2026-05-23 07:49:46,267 INFO    rollout k=2 | codes_len=256
+2026-05-23 07:49:46,267 INFO    rollout k=3 | codes_len=256
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 54.99it/s]
+2026-05-23 07:49:46,794 INFO    k=0 | wav=repo/train/runs/indextts-grpo-run1/wav/step0001_k0.wav
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 54.72it/s]
+2026-05-23 07:49:47,324 INFO    k=1 | wav=repo/train/runs/indextts-grpo-run1/wav/step0001_k1.wav
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 54.72it/s]
+2026-05-23 07:49:47,855 INFO    k=2 | wav=repo/train/runs/indextts-grpo-run1/wav/step0001_k2.wav
+100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 54.72it/s]
+2026-05-23 07:49:48,385 INFO    k=3 | wav=repo/train/runs/indextts-grpo-run1/wav/step0001_k3.wav
+Traceback (most recent call last):
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/srv/RL_project/repo/train/indextts_grpo_train.py", line 325, in <module>
+    main(args.config)
+  File "/srv/RL_project/repo/train/indextts_grpo_train.py", line 230, in main
+    r_dict = hub.score(example, control, wav_path, translated_text)
+  File "/srv/RL_project/repo/train/components.py", line 124, in score
+    rewards["local_emphasis"] = self._local_emphasis_reward(control, wav_path, translated_text)
+  File "/srv/RL_project/repo/train/components.py", line 181, in _local_emphasis_reward
+    align_result = JsonServiceClient(align_spec.url or "").post(
+  File "/srv/RL_project/repo/train/http_client.py", line 28, in post
+    with urllib.request.urlopen(request, timeout=self.timeout) as response:
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 519, in open
+    response = self._open(req, data)
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 496, in _call_chain
+    result = func(*args)
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 1377, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 1352, in do_open
+    r = h.getresponse()
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/http/client.py", line 1375, in getresponse
+    response.begin()
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/http/client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/http/client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/socket.py", line 717, in readinto
+    return self._sock.recv_into(b)
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/srv/RL_project/repo/train/indextts_grpo_train.py", line 325, in <module>
+    main(args.config)
+  File "/srv/RL_project/repo/train/indextts_grpo_train.py", line 230, in main
+    r_dict = hub.score(example, control, wav_path, translated_text)
+  File "/srv/RL_project/repo/train/components.py", line 124, in score
+    rewards["local_emphasis"] = self._local_emphasis_reward(control, wav_path, translated_text)
+  File "/srv/RL_project/repo/train/components.py", line 181, in _local_emphasis_reward
+    align_result = JsonServiceClient(align_spec.url or "").post(
+  File "/srv/RL_project/repo/train/http_client.py", line 28, in post
+    with urllib.request.urlopen(request, timeout=self.timeout) as response:
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 519, in open
+    response = self._open(req, data)
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 496, in _call_chain
+    result = func(*args)
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 1377, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/urllib/request.py", line 1352, in do_open
+    r = h.getresponse()
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/http/client.py", line 1375, in getresponse
+    response.begin()
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/http/client.py", line 318, in begin
+    version, status, reason = self._read_status()
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/http/client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/socket.py", line 717, in readinto
+    return self._sock.recv_into(b)
+KeyboardInterrupt

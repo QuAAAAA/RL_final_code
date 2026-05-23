@@ -42,7 +42,11 @@ def grpo_loss(
 
     if advantages.dim() == 1:
         advantages = advantages.unsqueeze(-1)
-    ratio = torch.exp(policy_logprobs - old_logprobs)
+
+    # ρ = πθ / pSFT  (公式 3：分母固定用 reference/SFT model)
+    # 若 ref_logprobs 未提供則 fallback 到 old_logprobs（π_old）
+    denom_lp = ref_logprobs if ref_logprobs is not None else old_logprobs
+    ratio = torch.exp(policy_logprobs - denom_lp)
     unclipped = ratio * advantages
     clipped = torch.clamp(ratio, 1.0 - clip_eps, 1.0 + clip_eps) * advantages
     loss_terms = -torch.minimum(unclipped, clipped)

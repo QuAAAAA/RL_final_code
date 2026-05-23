@@ -41,5 +41,12 @@
     "emotion": 1.0,
     "vad": 1.0,
     "global_intensity": 1.0
+  },
+  "keep_last_checkpoints": 5,
+  "wandb": {
+    "enabled": false,
+    "project": "rl-tts-grpo",
+    "name": "indextts-grpo-smoke",
+    "mode": "offline"
   }
 }

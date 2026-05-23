@@ -31,18 +31,22 @@ def _load_wav(path: str):
 @app.route("/score")
 def score(payload: dict) -> dict:
     wav, sr = _load_wav(payload["audio_path"])
-    boundaries = payload.get("word_boundaries")
-    targets = payload.get("emphasis_targets") or []
-    if not boundaries:
-        # Placeholder until NeMo alignment is wired in: equal-width pseudo boundaries.
-        words = [str(item.get("word")) for item in targets if item.get("word")]
-        dur = wav.numel() / float(sr)
-        step = dur / max(len(words), 1)
-        boundaries = [(word, idx * step, (idx + 1) * step) for idx, word in enumerate(words)]
-    if not boundaries:
+    boundaries = payload.get("word_boundaries") or []
+    target_indices = payload.get("target_indices") or []
+
+    if not boundaries or not target_indices:
         return {"ok": True, "total": 0.0}
-    result = REWARD.compute(wav, sr, boundaries, int(payload.get("target_idx", 0)))
-    return {"ok": True, **result}
+
+    # Average reward over all target indices
+    total = 0.0
+    for target_idx in target_indices:
+        if target_idx < 0 or target_idx >= len(boundaries):
+            continue
+        r = REWARD.compute(wav, sr, [tuple(b) for b in boundaries], int(target_idx))
+        total += float(r.get("total", 0.0))
+    total = total / max(len(target_indices), 1)
+
+    return {"ok": True, "total": total}
 
 
 def main() -> None:

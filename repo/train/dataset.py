@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import random
 import re
 from pathlib import Path
 from typing import Iterable
@@ -107,6 +108,22 @@ def emphasis_targets(quadruplets: Iterable[JsonDict]) -> list[JsonDict]:
                 strength = "weak"
         targets.append({"word": opinion, "aspect": aspect, "strength": strength, "va": item.get("VA")})
     return targets
+
+
+def build_random_control(example: TrainExample) -> ControlPlan:
+    """Sample target emotion uniformly at random; VA values still provided for MLP."""
+    va = mean_va(example.quadruplets)
+    sampled_emotion = random.choice(EMOTION_LABELS)
+    return ControlPlan(
+        text=example.text,
+        tagged_text=example.tagged_text,
+        target_emotion=sampled_emotion,
+        emotion_vector=emotion_vector(sampled_emotion),
+        va=va,
+        va_01=va_to_unit(va),
+        emphasis_targets=emphasis_targets(example.quadruplets),
+        quadruplets=example.quadruplets,
+    )
 
 
 def build_gold_control(example: TrainExample) -> ControlPlan:

@@ -1,0 +1,16 @@
+{"time":"2026-05-23T06:08:26.855740277Z","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"/srv/RL_project/wandb/run-20260523_060826-24zlbfnu/logs/debug-core.log"}
+{"time":"2026-05-23T06:08:27.196787093Z","level":"INFO","msg":"created new stream","id":"24zlbfnu"}
+{"time":"2026-05-23T06:08:27.196818673Z","level":"INFO","msg":"stream: started","id":"24zlbfnu"}
+{"time":"2026-05-23T06:08:27.196842063Z","level":"INFO","msg":"writer: Do: started","stream_id":"24zlbfnu"}
+{"time":"2026-05-23T06:08:27.196874773Z","level":"INFO","msg":"sender: started","stream_id":"24zlbfnu"}
+{"time":"2026-05-23T06:08:27.196888123Z","level":"INFO","msg":"handler: started","stream_id":"24zlbfnu"}
+{"time":"2026-05-23T06:08:28.081592441Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2026-05-23T06:36:58.764374761Z","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/files/handsome-ii14-national-yang-ming-chiao-tung-university/rl-tts-grpo/24zlbfnu/file_stream\": dial tcp: lookup api.wandb.ai on 127.0.0.53:53: server misbehaving"}
+{"time":"2026-05-23T07:34:10.754239267Z","level":"INFO","msg":"stream: closing","id":"24zlbfnu"}
+{"time":"2026-05-23T07:34:10.754302957Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2026-05-23T07:34:10.754377568Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2026-05-23T07:34:12.637163553Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-05-23T07:34:12.937572962Z","level":"INFO","msg":"handler: closed","stream_id":"24zlbfnu"}
+{"time":"2026-05-23T07:34:12.937603313Z","level":"INFO","msg":"writer: Close: closed","stream_id":"24zlbfnu"}
+{"time":"2026-05-23T07:34:12.937629263Z","level":"INFO","msg":"sender: closed","stream_id":"24zlbfnu"}
+{"time":"2026-05-23T07:34:12.937634583Z","level":"INFO","msg":"stream: closed","id":"24zlbfnu"}

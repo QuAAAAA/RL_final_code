@@ -16,6 +16,7 @@ CONFIG="${1:-repo/train/config.indextts_grpo.real.json}"
 
 VENV="${ROOT_DIR}/.venv/bin/python"
 VENV_W2V2="${ROOT_DIR}/repo/w2v2-how-to/venv_w2v2/bin/python"
+VENV_NEMO="${ROOT_DIR}/repo/NeMo/.venv/bin/python"
 VENV_INDEXTTS="${ROOT_DIR}/repo/index-tts/.venv/bin/python"
 VENV_ASR="${ROOT_DIR}/repo/ASR_sys/.venv/bin/python"
 
@@ -100,10 +101,16 @@ start_service "vad" \
     "${VENV_W2V2}" -m repo.train.services.vad_service \
     --host 127.0.0.1 --port 8107
 
+# faster-whisper Taigi alignment (port 8108) — 用主 venv
+start_service "alignment" \
+    "${VENV}" -m repo.train.services.alignment_service \
+    --host 127.0.0.1 --port 8108
+
 # ── 等服務全部就緒 ────────────────────────────────────────────────────────────
 wait_for_service "emotion"       8104
 wait_for_service "local_emphasis" 8106
 wait_for_service "vad"           8107
+wait_for_service "alignment"     8108
 
 echo ""
 echo "[run] 所有服務就緒，開始 GRPO 訓練..."

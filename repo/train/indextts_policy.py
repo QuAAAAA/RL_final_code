@@ -16,7 +16,29 @@ from pathlib import Path
 from typing import Optional
 
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
+
+
+# ---------------------------------------------------------------------------
+# VA → alpha MLP
+# ---------------------------------------------------------------------------
+
+class VAAlphaMLP(nn.Module):
+    """Mean VA (0-1 scale, 2D) → scalar alpha ∈ (0,1) via small MLP."""
+
+    def __init__(self, hidden: int = 16) -> None:
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(2, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, 1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, va_01: torch.Tensor) -> torch.Tensor:
+        """va_01: [2] → alpha: scalar tensor"""
+        return self.net(va_01.float()).squeeze(-1)
 
 
 # ---------------------------------------------------------------------------
@@ -34,6 +56,11 @@ class Conditioning:
     ref_mel: torch.Tensor                 # [1, n_mels, T_ref]
     # Filled lazily by rollout()
     speech_conditioning_latent: Optional[torch.Tensor] = field(default=None)
+    # For MLP alpha-shift gradient in compute_logprobs
+    base_emovec: Optional[torch.Tensor] = field(default=None)       # [1, dim] speaker-only
+    emo_mat: Optional[torch.Tensor] = field(default=None)           # [n_emo, dim] sampled rows
+    va_01: Optional[tuple] = field(default=None)                    # mean VA 0-1 scale
+    base_emotion_vector: Optional[list] = field(default=None)       # unscaled one-hot
 
 
 @dataclass
@@ -45,6 +72,11 @@ class RolloutResult:
     emovec: torch.Tensor                      # [1, dim]
     text_tokens: torch.Tensor                 # [1, L] int32
     use_speed: torch.Tensor                   # [1] long
+    # For MLP alpha-shift gradient in compute_logprobs
+    base_emovec: Optional[torch.Tensor] = field(default=None)
+    emo_mat: Optional[torch.Tensor] = field(default=None)
+    va_01: Optional[tuple] = field(default=None)
+    base_emotion_vector: Optional[list] = field(default=None)
 
 
 # ---------------------------------------------------------------------------
@@ -75,6 +107,7 @@ class IndexTTSPolicy:
         self.device = device
         self.gpt = self.tts.gpt
         self.stop_mel_token = self.tts.stop_mel_token
+        self.va_alpha_mlp = VAAlphaMLP(hidden=16).to(device)
 
     # ------------------------------------------------------------------
     # Conditioning preparation
@@ -84,6 +117,7 @@ class IndexTTSPolicy:
         self,
         spk_audio_path: str,
         emotion_vector: Optional[list[float]] = None,
+        va_01: Optional[tuple] = None,
     ) -> Conditioning:
         """Compute all speaker/emotion tensors needed for rollout and decode."""
         import librosa
@@ -102,6 +136,8 @@ class IndexTTSPolicy:
         input_features = inputs["input_features"].to(device)
         attention_mask = inputs["attention_mask"].to(device)
 
+        saved_emo_mat: Optional[torch.Tensor] = None
+
         with torch.no_grad():
             spk_cond_emb = tts.get_emb(input_features, attention_mask)  # [1, T, dim]
 
@@ -118,22 +154,35 @@ class IndexTTSPolicy:
                 S_ref, ylens=ref_target_lengths, n_quantizers=3, f0=None
             )[0]
 
-            # Merged emotion vector
+            # Speaker-only base emotion vector
             cond_len = torch.tensor([spk_cond_emb.shape[-1]], device=device)
-            emovec = gpt.merge_emovec(
+            base_emovec = gpt.merge_emovec(
                 spk_cond_emb, spk_cond_emb, cond_len, cond_len, alpha=1.0
             )  # [1, dim]
+            emovec = base_emovec
 
             if emotion_vector is not None and any(v > 0 for v in emotion_vector):
-                weight_vector = torch.tensor(emotion_vector, device=device)
+                # Compute alpha from VA values (use item() to get a plain float for rollout)
+                if va_01 is not None:
+                    va_t = torch.tensor(list(va_01), device=device)
+                    alpha = float(self.va_alpha_mlp(va_t).item())
+                else:
+                    alpha = 1.0
+
+                scaled_ev = [v * alpha for v in emotion_vector]
+                weight_vector = torch.tensor(scaled_ev, device=device)
+
                 rand_idx = [random.randint(0, x - 1) for x in tts.emo_num]
                 emo_mats = [
                     tts.emo_matrix[i][rand_idx[i]].unsqueeze(0)
                     for i in range(len(rand_idx))
                 ]
-                emo_mat = torch.cat(emo_mats, 0)
-                emovec_mat = torch.sum(weight_vector.unsqueeze(1) * emo_mat, 0).unsqueeze(0)
-                emovec = emovec_mat + (1.0 - torch.sum(weight_vector)) * emovec
+                saved_emo_mat = torch.cat(emo_mats, 0)  # [n_emo, dim]
+
+                emovec_mat = torch.sum(
+                    weight_vector.unsqueeze(1) * saved_emo_mat, 0
+                ).unsqueeze(0)
+                emovec = emovec_mat + (1.0 - torch.sum(weight_vector)) * base_emovec
 
         return Conditioning(
             spk_cond_emb=spk_cond_emb,
@@ -141,6 +190,10 @@ class IndexTTSPolicy:
             style=style,
             prompt_condition=prompt_condition,
             ref_mel=ref_mel,
+            base_emovec=base_emovec,
+            emo_mat=saved_emo_mat,
+            va_01=va_01,
+            base_emotion_vector=emotion_vector,
         )
 
     # ------------------------------------------------------------------
@@ -165,7 +218,7 @@ class IndexTTSPolicy:
 
         text_ids = tts.tokenizer.convert_tokens_to_ids(
             tts.tokenizer.split_segments(
-                tts.tokenizer.tokenize(text),
+                tts.tokenizer.tokenize(text, skip_normalizer=True),
                 max_text_tokens_per_segment=120,
             )[0]
         )
@@ -225,11 +278,75 @@ class IndexTTSPolicy:
             emovec=emovec,
             text_tokens=text_tokens,
             use_speed=use_speed,
+            base_emovec=cond.base_emovec,
+            emo_mat=cond.emo_mat,
+            va_01=cond.va_01,
+            base_emotion_vector=cond.base_emotion_vector,
         )
 
     # ------------------------------------------------------------------
     # Logprob computation (with gradient)
     # ------------------------------------------------------------------
+
+    def snapshot_reference(self) -> None:
+        """Freeze a deep copy of gpt as the reference model for KL regularization."""
+        import copy
+        self._ref_gpt = copy.deepcopy(self.gpt)
+        self._ref_gpt.eval()
+        for p in self._ref_gpt.parameters():
+            p.requires_grad_(False)
+
+    @torch.no_grad()
+    def compute_ref_logprobs(self, rollout: RolloutResult, k: int) -> torch.Tensor:
+        """Reference logprobs under the frozen initial model (no gradient)."""
+        if not hasattr(self, "_ref_gpt"):
+            raise RuntimeError("Call snapshot_reference() before compute_ref_logprobs()")
+
+        gpt = self._ref_gpt
+        device = self.device
+
+        codes = rollout.codes[k].long().unsqueeze(0)
+        speech_cond_latent = rollout.speech_conditioning_latent
+        emovec = rollout.emovec
+        text_tokens = rollout.text_tokens.long()
+        use_speed = rollout.use_speed
+        T = codes.shape[1]
+
+        d_emb = gpt.speed_emb(torch.zeros_like(use_speed))
+        d_emb_half = gpt.speed_emb(torch.ones_like(use_speed))
+        conds = torch.cat(
+            (
+                speech_cond_latent + emovec.unsqueeze(1),
+                d_emb_half.unsqueeze(1),
+                d_emb.unsqueeze(1),
+            ),
+            dim=1,
+        )
+
+        text_len = torch.tensor([text_tokens.shape[1]], device=device)
+        text_pad = gpt.set_text_padding(text_tokens.clone(), text_len)
+        text_pad = F.pad(text_pad, (0, 1), value=gpt.stop_text_token)
+        text_in, _ = gpt.build_aligned_inputs_and_targets(
+            text_pad, gpt.start_text_token, gpt.stop_text_token
+        )
+        text_emb = gpt.text_embedding(text_in) + gpt.text_pos_embedding(text_in)
+
+        mel_pad = F.pad(codes, (0, 1), value=gpt.stop_mel_token)
+        mel_in, _ = gpt.build_aligned_inputs_and_targets(
+            mel_pad, gpt.start_mel_token, gpt.stop_mel_token
+        )
+        mel_emb = gpt.mel_embedding(mel_in) + gpt.mel_pos_embedding(mel_in)
+
+        emb = torch.cat([conds, text_emb, mel_emb], dim=1)
+        gpt_out = gpt.gpt(inputs_embeds=emb, return_dict=True)
+        enc = gpt.final_norm(gpt_out.last_hidden_state[:, conds.shape[1]:])
+
+        mel_enc = enc[:, -mel_emb.shape[1]:]
+        mel_logits = gpt.mel_head(mel_enc)
+
+        log_probs = F.log_softmax(mel_logits, dim=-1)
+        lp = log_probs[:, :T].gather(2, codes.unsqueeze(-1)).squeeze(-1)
+        return lp.squeeze(0)
 
     def compute_logprobs(self, rollout: RolloutResult, k: int) -> torch.Tensor:
         """Teacher-forcing forward pass → logprobs for codes[k].
@@ -246,6 +363,25 @@ class IndexTTSPolicy:
         text_tokens = rollout.text_tokens.long()           # [1, L]
         use_speed = rollout.use_speed                      # [1]
         T = codes.shape[1]
+
+        # Recompute alpha-shifted emovec with gradient so MLP is trained end-to-end
+        if (
+            rollout.va_01 is not None
+            and rollout.base_emotion_vector is not None
+            and rollout.emo_mat is not None
+            and rollout.base_emovec is not None
+        ):
+            va_t = torch.tensor(list(rollout.va_01), device=device)
+            alpha = self.va_alpha_mlp(va_t)                        # scalar, has grad
+            weight_vector = (
+                torch.tensor(rollout.base_emotion_vector, device=device) * alpha
+            )                                                       # [n_emo], has grad
+            emo_mat = rollout.emo_mat.to(device)                   # [n_emo, dim]
+            emovec_mat = torch.sum(
+                weight_vector.unsqueeze(1) * emo_mat, dim=0
+            ).unsqueeze(0)                                          # [1, dim]
+            base_ev = rollout.base_emovec.to(device).detach()      # [1, dim]
+            emovec = emovec_mat + (1.0 - weight_vector.sum()) * base_ev
 
         # Conditioning (mirrors UnifiedVoice.forward)
         d_emb = gpt.speed_emb(torch.zeros_like(use_speed))       # [1, dim]

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import wave
 from pathlib import Path
 from typing import Any
+
+log = logging.getLogger(__name__)
 
 from .dataset import build_gold_control
 from .global_intensity_reward import global_emotion_intensity_reward_json
@@ -101,7 +104,7 @@ class ComponentHub:
         )
         return result.get("wav_path")
 
-    def score(self, example: TrainExample, control: ControlPlan, wav_path: str | None) -> dict[str, Any]:
+    def score(self, example: TrainExample, control: ControlPlan, wav_path: str | None, translated_text: str | None = None) -> dict[str, Any]:
         rewards: dict[str, Any] = {}
         if not wav_path:
             for name in self.enabled_rewards:
@@ -118,7 +121,7 @@ class ComponentHub:
         if self._is_enabled("speaker"):
             rewards["speaker"] = self._speaker_reward(wav_path)
         if self._is_enabled("local_emphasis"):
-            rewards["local_emphasis"] = self._local_emphasis_reward(control, wav_path)
+            rewards["local_emphasis"] = self._local_emphasis_reward(control, wav_path, translated_text)
         if self._is_enabled("vad"):
             rewards["vad"] = float(vad_va.get("reward", 0.0)) if vad_va else 0.0
         if self._is_enabled("global_intensity"):
@@ -162,19 +165,40 @@ class ComponentHub:
         )
         return float(result.get("similarity", 0.0))
 
-    def _local_emphasis_reward(self, control: ControlPlan, wav_path: str) -> float:
+    def _local_emphasis_reward(self, control: ControlPlan, wav_path: str, translated_text: str | None = None) -> float:
         spec = self.specs.get("local_emphasis")
-        if spec is None or spec.mock or not control.emphasis_targets:
+        if spec is None or spec.mock:
             return 1.0 if control.emphasis_targets else 0.0
+
+        # 取得 NeMo alignment boundaries
+        align_spec = self.specs.get("alignment")
+        word_boundaries: list | None = None
+        target_indices: list | None = None
+
+        text_for_align = translated_text or control.tagged_text
+        if align_spec and not align_spec.mock and text_for_align:
+            try:
+                align_result = JsonServiceClient(align_spec.url or "").post(
+                    "/align", {"audio_path": wav_path, "text": text_for_align}
+                )
+                word_boundaries = align_result.get("boundaries") or []
+                target_indices = align_result.get("target_indices") or []
+            except Exception as exc:
+                log.warning("_local_emphasis_reward: alignment failed (%s); skipping.", exc)
+                return 0.0
+
+        if not word_boundaries or not target_indices:
+            return 0.0
+
         result = JsonServiceClient(spec.url or "").post(
             "/score",
             {
                 "audio_path": wav_path,
-                "emphasis_targets": control.emphasis_targets,
-                "text": control.text,
+                "word_boundaries": word_boundaries,
+                "target_indices": target_indices,
             },
         )
-        return float(result.get("total", result.get("reward", 0.0)))
+        return float(result.get("total", 0.0))
 
     def _vad_va(self, control: ControlPlan, wav_path: str) -> dict[str, Any] | None:
         spec = self.specs.get("vad")
@@ -184,7 +208,20 @@ class ComponentHub:
         if spec.mock:
             pred_valence, pred_arousal = target
         else:
-            result = JsonServiceClient(spec.url or "").post("/va", {"audio_path": wav_path})
+            try:
+                with wave.open(wav_path, "rb") as wf:
+                    duration_sec = wf.getnframes() / max(wf.getframerate(), 1)
+            except Exception as exc:
+                log.warning("_vad_va: cannot open wav %s (%s); skipping VA scoring.", wav_path, exc)
+                return None
+            if duration_sec < 0.5:
+                log.warning("_vad_va: audio too short (%.3fs) at %s; skipping VA scoring.", duration_sec, wav_path)
+                return None
+            try:
+                result = JsonServiceClient(spec.url or "").post("/va", {"audio_path": wav_path})
+            except Exception as exc:
+                log.warning("_vad_va: VA service error for %s: %s; skipping.", wav_path, exc)
+                return None
             pred_valence = float(result["valence"])
             pred_arousal = float(result["arousal"])
 
