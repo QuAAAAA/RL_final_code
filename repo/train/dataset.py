@@ -9,7 +9,11 @@ from typing import Iterable
 from .schemas import ControlPlan, JsonDict, TrainExample
 
 
-EMOTION_LABELS = ["joy", "anger", "sadness", "fear", "disgust", "low_mood", "surprise", "neutral"]
+# Fixed 8-dim slot order matching IndexTTS emo_matrix: [joy, anger, sadness, fear, disgust, low_mood, surprise, calm]
+_EMOTION_SLOTS = ["joy", "anger", "sadness", "fear", "disgust", "low_mood", "surprise", "calm"]
+
+# Emotions available for GRPO sampling; "neutral" maps to all-zero vector (no emotion activation)
+EMOTION_LABELS = ["joy", "anger", "sadness", "fear", "disgust", "surprise", "neutral"]
 
 
 def load_jsonl(path: str | Path, limit: int | None = None) -> list[TrainExample]:
@@ -85,9 +89,9 @@ def va_to_emotion(va: tuple[float, float] | None) -> str:
 
 
 def emotion_vector(label: str, strength: float = 1.4) -> list[float]:
-    vector = [0.0] * len(EMOTION_LABELS)
-    if label in EMOTION_LABELS and label != "neutral":
-        vector[EMOTION_LABELS.index(label)] = strength
+    vector = [0.0] * len(_EMOTION_SLOTS)
+    if label in _EMOTION_SLOTS:
+        vector[_EMOTION_SLOTS.index(label)] = strength
     return vector
 
 

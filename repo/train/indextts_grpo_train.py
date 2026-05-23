@@ -20,7 +20,7 @@ from pathlib import Path
 
 import torch
 from pydub import AudioSegment
-from pydub.silence import split_on_silence
+from pydub.silence import detect_leading_silence
 
 # Make both `repo.train.*` and bare `train.*` importable from this entry point
 _ROOT = Path(__file__).parent.parent.parent  # /srv/RL_project
@@ -31,23 +31,19 @@ for _p in [str(_ROOT), str(_REPO)]:
 
 
 def _remove_silence_batch(wav_paths: list[str | None]) -> None:
-    """In-place silence removal for a batch of wav files."""
+    """Trim leading/trailing silence in-place; mid-audio silence is preserved."""
     for path in wav_paths:
         if not path or not Path(path).exists():
             continue
         try:
             audio = AudioSegment.from_file(path)
-            chunks = split_on_silence(
-                audio,
-                min_silence_len=200,
-                silence_thresh=-40,
-                keep_silence=50,
-            )
-            if chunks:
-                processed = chunks[0]
-                for chunk in chunks[1:]:
-                    processed += chunk
-                processed.export(path, format="wav")
+            silence_thresh = -55
+            keep_silence = 150
+            start = max(0, detect_leading_silence(audio, silence_threshold=silence_thresh) - keep_silence)
+            end = max(0, detect_leading_silence(audio.reverse(), silence_threshold=silence_thresh) - keep_silence)
+            trimmed = audio[start: len(audio) - end if end else len(audio)]
+            if len(trimmed) > 0:
+                trimmed.export(path, format="wav")
         except Exception:
             continue
 
@@ -57,6 +53,19 @@ def _rotate_checkpoints(ckpt_dir: Path, keep: int) -> None:
     ckpts = sorted(ckpt_dir.glob("step_*.pth"))
     for old in ckpts[:-keep]:
         old.unlink()
+
+
+def _rotate_wavs(wav_dir: Path, keep_steps: int) -> None:
+    """Remove WAVs from old steps, keeping only the latest `keep_steps` steps."""
+    import re
+    step_map: dict[int, list[Path]] = {}
+    for f in wav_dir.glob("step*.wav"):
+        m = re.match(r"step(\d+)_k\d+\.wav", f.name)
+        if m:
+            step_map.setdefault(int(m.group(1)), []).append(f)
+    for step_idx in sorted(step_map)[:-keep_steps]:
+        for f in step_map[step_idx]:
+            f.unlink(missing_ok=True)
 
 
 def main(config_path: str) -> None:
@@ -308,6 +317,7 @@ def main(config_path: str) -> None:
                 str(ckpt_path),
             )
             _rotate_checkpoints(ckpt_dir, keep=keep_last)
+            _rotate_wavs(output_dir / "wav", keep_steps=10)
             log.info("   checkpoint → %s", ckpt_path)
             step += 1
 

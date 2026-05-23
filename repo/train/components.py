@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import math
 import wave
 from pathlib import Path
 from typing import Any
@@ -63,7 +64,7 @@ class ComponentHub:
         self.enabled_rewards = set(
             self.reward_options.get(
                 "enabled_rewards",
-                ["asr", "emotion", "speaker", "local_emphasis", "vad", "global_intensity"],
+                ["asr", "emotion", "speaker", "local_emphasis", "global_intensity"],
             )
         )
 
@@ -112,8 +113,7 @@ class ComponentHub:
             rewards["vad_va"] = None
             return rewards
 
-        vad_va = self._vad_va(control, wav_path)
-        vad_vector = self._vad_vector(control, wav_path, vad_va)
+        vad_vector = self._vad_vector(control, wav_path)
         if self._is_enabled("asr"):
             rewards["asr"] = self._asr_reward(example, wav_path)
         if self._is_enabled("emotion"):
@@ -122,13 +122,11 @@ class ComponentHub:
             rewards["speaker"] = self._speaker_reward(wav_path)
         if self._is_enabled("local_emphasis"):
             rewards["local_emphasis"] = self._local_emphasis_reward(control, wav_path, translated_text)
-        if self._is_enabled("vad"):
-            rewards["vad"] = float(vad_va.get("reward", 0.0)) if vad_va else 0.0
         if self._is_enabled("global_intensity"):
-            intensity = self._global_intensity_reward(vad_vector)
+            intensity = self._global_intensity_reward(vad_vector, control)
             rewards["global_intensity"] = float(intensity["reward"])
             rewards["global_intensity_details"] = intensity
-        rewards["vad_va"] = vad_va
+        rewards["vad_va"] = self._vad_va(control, wav_path)
         rewards["vad_vector"] = vad_vector
         return rewards
 
@@ -243,7 +241,6 @@ class ComponentHub:
         self,
         control: ControlPlan,
         wav_path: str,
-        vad_va: dict[str, Any] | None,
     ) -> list[float] | None:
         spec = self.specs.get("vad")
         if spec is None:
@@ -257,16 +254,46 @@ class ComponentHub:
         result = JsonServiceClient(spec.url or "").post("/vad", {"audio_path": wav_path})
         return [float(result["arousal"]), float(result["dominance"]), float(result["valence"])]
 
-    def _global_intensity_reward(self, vad_vector: list[float] | None) -> dict[str, Any]:
+    def _resolve_intensity_range(self, control: ControlPlan, cfg: dict) -> tuple[list[float], str, float]:
+        """Return (target_range, intensity_level, d_target) based on target VA distance."""
+        intensity_ranges: dict[str, list[float]] = cfg.get("intensity_ranges", {
+            "weak":   [0.05, 0.20],
+            "medium": [0.20, 0.35],
+            "strong": [0.35, 0.60],
+        })
+        thresholds: list[float] = cfg.get("intensity_thresholds", [0.13, 0.24])
+
+        if control.va_01 is None:
+            return intensity_ranges.get("medium", [0.20, 0.35]), "medium", 0.0
+
+        v, a = control.va_01
+        d_target = math.sqrt((v - 0.5) ** 2 + (a - 0.5) ** 2)
+
+        if d_target < thresholds[0]:
+            level = "weak"
+        elif d_target < thresholds[1]:
+            level = "medium"
+        else:
+            level = "strong"
+
+        return intensity_ranges.get(level, [0.20, 0.35]), level, d_target
+
+    def _global_intensity_reward(self, vad_vector: list[float] | None, control: ControlPlan) -> dict[str, Any]:
         cfg = self.reward_options.get("global_intensity", {})
         if vad_vector is None:
-            return {"reward": 0.0, "d_y_hat": None, "R_interval": 0.0, "R_gaussian": 0.0}
-        return global_emotion_intensity_reward_json(
+            return {"reward": 0.0, "d_y_hat": None, "R_interval": 0.0, "R_gaussian": 0.0,
+                    "intensity_level": None, "d_target": None}
+        target_range, level, d_target = self._resolve_intensity_range(control, cfg)
+        result = global_emotion_intensity_reward_json(
             vad_vector,
             cfg.get("mu_neutral", [0.5, 0.5, 0.5]),
-            cfg.get("target_range", [0.4, 0.6]),
+            target_range,
             sigma=float(cfg.get("sigma", 0.1)),
         )
+        result["intensity_level"] = level
+        result["d_target"] = d_target
+        result["target_range"] = target_range
+        return result
 
     def _write_mock_wav(self, uid: str) -> str:
         wav_dir = self.output_dir / "wav"

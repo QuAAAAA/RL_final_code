@@ -11,7 +11,7 @@
   "data_path": "data/va_train/zho_restaurant_train_alltasks_tagged.jsonl",
 
   "__HPARAM__limit":        "訓練樣本數上限，null = 用全部資料",
-  "limit": 500,
+  "limit": null,
 
   "__HPARAM__updates":      "整個資料集跑幾輪（epoch 數）",
   "updates": 1,
@@ -32,13 +32,13 @@
   "top_p": 0.9,
 
   "__HPARAM__learning_rate": "AdamW 學習率",
-  "learning_rate": 1e-5,
+  "learning_rate": 1e-6,
 
   "grpo": {
     "__HPARAM__clip_eps": "PPO surrogate loss clip 範圍（標準值 0.2）",
     "clip_eps": 0.2,
     "__HPARAM__beta":     "KL 懲罰係數（0.0 = 純 GRPO，>0 = 加入 KL 正則化）",
-    "beta": 0.01
+    "beta": 0.1
   },
 
   "services": {
@@ -54,13 +54,19 @@
 
   "reward_options": {
     "__HPARAM__enabled_rewards": "要計算哪些 reward",
-    "enabled_rewards": ["emotion", "vad", "global_intensity", "local_emphasis"],
+    "enabled_rewards": ["emotion", "global_intensity", "local_emphasis"],
     "global_intensity": {
-      "__HPARAM__mu_neutral":    "VAD 空間的「中性」中心點（需用真實中性語音校準）",
+      "__HPARAM__mu_neutral":           "VAD 空間的「中性」中心點（需用真實中性語音校準）",
       "mu_neutral": [0.5, 0.5, 0.5],
-      "__HPARAM__target_range":  "目標情緒強度距離區間 [low, high]",
-      "target_range": [0.4, 0.6],
-      "__HPARAM__sigma":         "Gaussian reward 的寬度",
+      "__HPARAM__intensity_thresholds": "target VA 距離的 weak/medium/strong 切點 [weak_max, medium_max]",
+      "intensity_thresholds": [0.13, 0.24],
+      "__HPARAM__intensity_ranges":     "各強度等級對應的 3D VAD 距離目標區間",
+      "intensity_ranges": {
+        "weak":   [0.05, 0.20],
+        "medium": [0.20, 0.35],
+        "strong": [0.35, 0.60]
+      },
+      "__HPARAM__sigma":                "Gaussian reward 的寬度",
       "sigma": 0.1,
       "mock_dominance": 0.5
     }
@@ -70,9 +76,8 @@
   "reward_weights": {
     "asr":              0.5,
     "emotion":          1.0,
-    "vad":              1.0,
-    "global_intensity": 0.5,
-    "local_emphasis":   0.5,
+    "global_intensity": 1.0,
+    "local_emphasis":   1.0,
     "speaker":          0.3
   },
 

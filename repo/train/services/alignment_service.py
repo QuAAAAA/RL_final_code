@@ -1,4 +1,4 @@
-"""Faster-Whisper Taigi alignment HTTP service.
+"""Alignment HTTP service — Whisper word-level timestamps.
 
 API:
     POST /align  {audio_path: str, text: str}
@@ -6,6 +6,10 @@ API:
 
 `text` should be the tagged text with "" around emphasis words.
 `target_indices` are the indices into `boundaries` that were inside quotes.
+
+Uses faster-whisper with word_timestamps=True to get actual word-level timing,
+then maps to ground-truth words by position. No ASR transcription is used —
+only the timing information from Whisper.
 """
 
 from __future__ import annotations
@@ -38,8 +42,8 @@ def _strip_quotes(token: str) -> str:
     return token
 
 
-def _preprocess_tagged_text(text: str) -> tuple[str, list[int]]:
-    """Strip quote markers; return (clean_text, target_word_indices)."""
+def _preprocess_tagged_text(text: str) -> tuple[list[str], list[int]]:
+    """Strip quote markers; return (clean_words, target_word_indices)."""
     tokens = text.split()
     clean_words: list[str] = []
     target_indices: list[int] = []
@@ -57,7 +61,7 @@ def _preprocess_tagged_text(text: str) -> tuple[str, list[int]]:
         if has_quote:
             inside_quote = not inside_quote
 
-    return " ".join(clean_words), target_indices
+    return clean_words, target_indices
 
 
 def _get_model():
@@ -69,49 +73,27 @@ def _get_model():
     return _MODEL
 
 
-def _distribute_words(
-    seg_chunks: list[dict],
-    ref_words: list[str],
-) -> list[list]:
-    """Distribute reference words across segment timestamps proportionally."""
-    if not ref_words or not seg_chunks:
+def _map_to_ref(ref_words: list[str], whisper_times: list[tuple[float, float]]) -> list[list]:
+    """Map ground-truth words to Whisper word timestamps by position.
+
+    If counts match, use 1:1 mapping. Otherwise fall back to proportional
+    distribution within Whisper's detected time span.
+    """
+    if not whisper_times:
         return []
 
-    total_dur = sum(
-        max(float(c["end"]) - float(c["start"]), 0.0)
-        for c in seg_chunks
-    )
-    if total_dur <= 0:
-        t0 = float(seg_chunks[0]["start"])
-        t1 = float(seg_chunks[-1]["end"])
-        dur = max(t1 - t0, 0.01)
-        step = dur / len(ref_words)
-        return [[w, t0 + i * step, t0 + (i + 1) * step] for i, w in enumerate(ref_words)]
-
     n = len(ref_words)
-    seg_counts: list[int] = []
-    for c in seg_chunks:
-        seg_dur = max(float(c["end"]) - float(c["start"]), 0.0)
-        seg_counts.append(max(1, round(n * seg_dur / total_dur)))
+    m = len(whisper_times)
 
-    while sum(seg_counts) > n:
-        seg_counts[seg_counts.index(max(seg_counts))] -= 1
-    while sum(seg_counts) < n:
-        seg_counts[seg_counts.index(min(seg_counts))] += 1
+    if n == m:
+        return [[ref_words[i], whisper_times[i][0], whisper_times[i][1]] for i in range(n)]
 
-    boundaries: list[list] = []
-    word_idx = 0
-    for chunk, count in zip(seg_chunks, seg_counts):
-        t0 = float(chunk["start"])
-        t1 = float(chunk["end"])
-        step = max(t1 - t0, 0.01) / count
-        for j in range(count):
-            if word_idx >= n:
-                break
-            boundaries.append([ref_words[word_idx], t0 + j * step, t0 + (j + 1) * step])
-            word_idx += 1
-
-    return boundaries
+    # Count mismatch: distribute evenly within Whisper's actual time span
+    t_start = whisper_times[0][0]
+    t_end = whisper_times[-1][1]
+    duration = max(t_end - t_start, 0.01)
+    step = duration / n
+    return [[w, t_start + i * step, t_start + (i + 1) * step] for i, w in enumerate(ref_words)]
 
 
 @app.route("/align")
@@ -119,9 +101,7 @@ def align(payload: dict) -> dict:
     audio_path = str(Path(payload["audio_path"]).expanduser().resolve())
     text = str(payload["text"])
 
-    clean_text, target_indices = _preprocess_tagged_text(text)
-    ref_words = [w for w in clean_text.split() if w.strip()]
-
+    ref_words, target_indices = _preprocess_tagged_text(text)
     if not ref_words:
         return {"ok": True, "boundaries": [], "target_indices": []}
 
@@ -129,25 +109,27 @@ def align(payload: dict) -> dict:
     segments, _ = model.transcribe(
         audio_path,
         language="zh",
-        initial_prompt=clean_text,
+        initial_prompt=" ".join(ref_words),
+        word_timestamps=True,
     )
 
-    seg_chunks = [
-        {"start": seg.start, "end": seg.end}
-        for seg in segments
-    ]
+    whisper_times: list[tuple[float, float]] = []
+    for seg in segments:
+        if seg.words:
+            for w in seg.words:
+                whisper_times.append((float(w.start), float(w.end)))
 
-    if not seg_chunks:
+    if not whisper_times:
         return {"ok": True, "boundaries": [], "target_indices": []}
 
-    boundaries = _distribute_words(seg_chunks, ref_words)
+    boundaries = _map_to_ref(ref_words, whisper_times)
     target_indices = [i for i in target_indices if i < len(boundaries)]
     return {"ok": True, "boundaries": boundaries, "target_indices": target_indices}
 
 
 def main() -> None:
     global MODEL_PATH, DEVICE
-    parser = argparse.ArgumentParser(description="Taigi faster-whisper alignment HTTP service")
+    parser = argparse.ArgumentParser(description="Alignment HTTP service (Whisper word timestamps)")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, required=True)
     parser.add_argument("--model", default=DEFAULT_MODEL)

@@ -16,7 +16,7 @@ from local_emphasis_reward import LocalEmphasisReward  # noqa: E402
 
 
 app = JsonApiServer()
-REWARD = LocalEmphasisReward()
+REWARD = LocalEmphasisReward(preset="paper_baseline")
 
 
 def _load_wav(path: str):

@@ -54,6 +54,10 @@ class LocalEmphasisRewardConfig:
                 "use_log_energy": False,
                 "soft_mode": "relative_mean",
                 "min_voiced_ratio": 0.0,
+                "alpha": 1.0,
+                "beta": 1.0,
+                "gamma": 1.0,
+                "delta": 1.0,
                 "lambda_pitch_rank": 0.0,
                 "lambda_energy_rank": 0.0,
             }
