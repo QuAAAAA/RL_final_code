@@ -1,0 +1,175 @@
+2026-05-24 03:21:19,300 INFO W&B initialised: project=rl-tts-grpo run=indextts-grpo-run1
+2026-05-24 03:21:19,300 INFO Loading IndexTTS policy…
+2026-05-24 03:21:21,194 INFO We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+>> Adjusting GPT config vocab size from 12000 to 14001 based on checkpoint.
+>> GPT load missing keys: ['text_embedding.weight', 'text_head.weight', 'text_head.bias']
+>> Reshaping GPT parameter 'text_embedding.weight' from torch.Size([14001, 1280]) to torch.Size([14002, 1280])
+>> Reshaping GPT parameter 'text_head.weight' from torch.Size([14001, 1280]) to torch.Size([14002, 1280])
+>> Reshaping GPT parameter 'text_head.bias' from torch.Size([14001]) to torch.Size([14002])
+>> GPT weights restored from: /srv/RL_project/models/IndexTTS_trained/GPTs/trained_200hr_4e_step202000.pth
+>> DeepSpeed usage disabled via INDEXTTS_USE_DEEPSPEED=0
+2026-05-24 03:21:27,180 WARNING GPT2InferenceModel has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+W0524 03:21:27.693000 2327533 index-tts/.venv/lib/python3.10/site-packages/torch/utils/cpp_extension.py:2425] TORCH_CUDA_ARCH_LIST is not set, all archs for visible cards are included for compilation.
+W0524 03:21:27.693000 2327533 index-tts/.venv/lib/python3.10/site-packages/torch/utils/cpp_extension.py:2425] If this is not desired, please set os.environ['TORCH_CUDA_ARCH_LIST'] to specific architectures.
+>> Failed to load custom CUDA kernel for BigVGAN. Falling back to torch.
+>> semantic_codec weights restored from: ./checkpoints/hf_cache/models--amphion--MaskGCT/snapshots/265c6cef07625665d0c28d2faafb1415562379dc/semantic_codec/model.safetensors
+cfm loaded
+length_regulator loaded
+gpt_layer loaded
+>> s2mel weights restored from: repo/index-tts/checkpoints/s2mel.pth
+>> campplus_model weights restored from: ./checkpoints/hf_cache/models--funasr--campplus/snapshots/81a8afba4ca420cf6f845f157d5fc1d365286821/campplus_cn_common.bin
+Loading weights from nvidia/bigvgan_v2_22khz_80band_256x
+Removing weight norm...
+>> bigvgan weights restored from: nvidia/bigvgan_v2_22khz_80band_256x
+2026-05-24 03:21:31,376 WETEXT INFO found existing fst: /srv/RL_project/repo/index-tts/indextts/utils/tagger_cache/zh_tn_tagger.fst
+2026-05-24 03:21:31,376 INFO found existing fst: /srv/RL_project/repo/index-tts/indextts/utils/tagger_cache/zh_tn_tagger.fst
+2026-05-24 03:21:31,376 WETEXT INFO                     /srv/RL_project/repo/index-tts/indextts/utils/tagger_cache/zh_tn_verbalizer.fst
+2026-05-24 03:21:31,376 INFO                     /srv/RL_project/repo/index-tts/indextts/utils/tagger_cache/zh_tn_verbalizer.fst
+2026-05-24 03:21:31,377 WETEXT INFO skip building fst for zh_normalizer ...
+2026-05-24 03:21:31,377 INFO skip building fst for zh_normalizer ...
+2026-05-24 03:21:31,511 WETEXT INFO found existing fst: /srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/tn/en_tn_tagger.fst
+2026-05-24 03:21:31,511 INFO found existing fst: /srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/tn/en_tn_tagger.fst
+2026-05-24 03:21:31,511 WETEXT INFO                     /srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/tn/en_tn_verbalizer.fst
+2026-05-24 03:21:31,511 INFO                     /srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/tn/en_tn_verbalizer.fst
+2026-05-24 03:21:31,511 WETEXT INFO skip building fst for en_normalizer ...
+2026-05-24 03:21:31,511 INFO skip building fst for en_normalizer ...
+>> TextNormalizer loaded
+>> bpe model loaded from: /srv/RL_project/models/IndexTTS_trained/checkpoints/bpe_extended.model
+2026-05-24 03:21:32,453 INFO Reference model snapshot taken (frozen for KL).
+2026-05-24 03:21:32,454 INFO Policy loaded.
+2026-05-24 03:21:32,475 INFO Loaded 6050 training examples.
+2026-05-24 03:21:32,476 INFO Starting GRPO training: 1 updates × 6050 examples = 6050 steps.
+2026-05-24 03:21:32,575 INFO ── Step 0 | uid=R0283:S003 | emotion=fear | va_01=(0.375, 0.5) | tagged='"肉粿""沒有很焦脆"。' | translated='"bah4-kue2" "bo5 tsiok4 tshau3-hue2-ta1--e5".'
+Use the specified emotion vector
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`...
+Traceback (most recent call last):
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/srv/RL_project/repo/train/indextts_grpo_train.py", line 336, in <module>
+    main(args.config)
+  File "/srv/RL_project/repo/train/indextts_grpo_train.py", line 210, in main
+    rollout = policy.rollout(
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/srv/RL_project/repo/train/indextts_policy.py", line 231, in rollout
+    output, speech_conditioning_latent = gpt.inference_speech(
+  File "/srv/RL_project/repo/index-tts/indextts/gpt/model_v2.py", line 806, in inference_speech
+    output = self.inference_model.generate(inputs,
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/indextts/gpt/transformers_generation_utils.py", line 2216, in generate
+    result = self._sample(
+  File "/srv/RL_project/repo/index-tts/indextts/gpt/transformers_generation_utils.py", line 3207, in _sample
+    outputs = self(**model_inputs, return_dict=True)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/indextts/gpt/model_v2.py", line 162, in forward
+    transformer_outputs = self.transformer(
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/models/gpt2/modeling_gpt2.py", line 926, in forward
+    outputs = self._gradient_checkpointing_func(
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/_compile.py", line 53, in inner
+    return disable_fn(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py", line 929, in _fn
+    return fn(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/utils/checkpoint.py", line 488, in checkpoint
+    return CheckpointFunction.apply(function, preserve, *args)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/autograd/function.py", line 576, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/utils/checkpoint.py", line 262, in forward
+    outputs = run_function(*args)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/utils/deprecation.py", line 172, in wrapped_func
+    return func(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/models/gpt2/modeling_gpt2.py", line 439, in forward
+    feed_forward_hidden_states = self.mlp(hidden_states)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/models/gpt2/modeling_gpt2.py", line 365, in forward
+    hidden_states = self.act(hidden_states)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/activations.py", line 47, in forward
+    return 0.5 * input * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (input + 0.044715 * torch.pow(input, 3.0))))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 40.00 MiB. GPU 0 has a total capacity of 31.36 GiB of which 26.56 MiB is free. Process 2327334 has 1.10 GiB memory in use. Including non-PyTorch memory, this process has 30.21 GiB memory in use. Of the allocated memory 27.78 GiB is allocated by PyTorch, and 1.84 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+Traceback (most recent call last):
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/srv/RL_project/python/cpython-3.10.19-linux-x86_64-gnu/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/srv/RL_project/repo/train/indextts_grpo_train.py", line 336, in <module>
+    main(args.config)
+  File "/srv/RL_project/repo/train/indextts_grpo_train.py", line 210, in main
+    rollout = policy.rollout(
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/srv/RL_project/repo/train/indextts_policy.py", line 231, in rollout
+    output, speech_conditioning_latent = gpt.inference_speech(
+  File "/srv/RL_project/repo/index-tts/indextts/gpt/model_v2.py", line 806, in inference_speech
+    output = self.inference_model.generate(inputs,
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/indextts/gpt/transformers_generation_utils.py", line 2216, in generate
+    result = self._sample(
+  File "/srv/RL_project/repo/index-tts/indextts/gpt/transformers_generation_utils.py", line 3207, in _sample
+    outputs = self(**model_inputs, return_dict=True)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/indextts/gpt/model_v2.py", line 162, in forward
+    transformer_outputs = self.transformer(
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/models/gpt2/modeling_gpt2.py", line 926, in forward
+    outputs = self._gradient_checkpointing_func(
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/_compile.py", line 53, in inner
+    return disable_fn(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py", line 929, in _fn
+    return fn(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/utils/checkpoint.py", line 488, in checkpoint
+    return CheckpointFunction.apply(function, preserve, *args)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/autograd/function.py", line 576, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/utils/checkpoint.py", line 262, in forward
+    outputs = run_function(*args)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/utils/deprecation.py", line 172, in wrapped_func
+    return func(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/models/gpt2/modeling_gpt2.py", line 439, in forward
+    feed_forward_hidden_states = self.mlp(hidden_states)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/models/gpt2/modeling_gpt2.py", line 365, in forward
+    hidden_states = self.act(hidden_states)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/srv/RL_project/repo/index-tts/.venv/lib/python3.10/site-packages/transformers/activations.py", line 47, in forward
+    return 0.5 * input * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (input + 0.044715 * torch.pow(input, 3.0))))
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 40.00 MiB. GPU 0 has a total capacity of 31.36 GiB of which 26.56 MiB is free. Process 2327334 has 1.10 GiB memory in use. Including non-PyTorch memory, this process has 30.21 GiB memory in use. Of the allocated memory 27.78 GiB is allocated by PyTorch, and 1.84 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

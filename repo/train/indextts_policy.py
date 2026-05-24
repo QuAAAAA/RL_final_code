@@ -413,7 +413,7 @@ class IndexTTSPolicy:
 
         # GPT forward
         emb = torch.cat([conds, text_emb, mel_emb], dim=1)
-        gpt_out = gpt.gpt(inputs_embeds=emb, return_dict=True)
+        gpt_out = gpt.gpt(inputs_embeds=emb, return_dict=True, use_cache=False)
         enc = gpt.final_norm(gpt_out.last_hidden_state[:, conds.shape[1]:])
 
         # Mel logits at code positions

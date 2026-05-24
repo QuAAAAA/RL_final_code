@@ -186,7 +186,7 @@ def main(config_path: str) -> None:
                 mode=translation_mode,
                 api_url=translation_api_url,
             )
-            translated_text = re.sub(r'(?<=")\s+|\s+(?=")', '', translated_text).strip()
+            translated_text = re.sub(r'"\s*(.*?)\s*"', r'"\1"', translated_text).strip()
             log.info("── Step %d | uid=%s | emotion=%s | va_01=%s | tagged=%r | translated=%r",
                      step, example.uid, control.target_emotion, control.va_01,
                      control.tagged_text[:60], translated_text[:60])
@@ -230,7 +230,7 @@ def main(config_path: str) -> None:
                 log.info("   k=%d | wav=%s", k, wav_path)
 
             # 3b. Remove silence from generated wavs
-            _remove_silence_batch(wav_paths)
+            # _remove_silence_batch(wav_paths)
 
             # 4. Rewards
             rewards: list[float] = []

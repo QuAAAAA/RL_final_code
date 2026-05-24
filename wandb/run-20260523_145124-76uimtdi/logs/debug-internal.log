@@ -1,0 +1,15 @@
+{"time":"2026-05-23T14:51:24.44056862Z","level":"INFO","msg":"stream: starting","core version":"0.19.11","symlink path":"/srv/RL_project/wandb/run-20260523_145124-76uimtdi/logs/debug-core.log"}
+{"time":"2026-05-23T14:51:24.755335864Z","level":"INFO","msg":"created new stream","id":"76uimtdi"}
+{"time":"2026-05-23T14:51:24.755365374Z","level":"INFO","msg":"stream: started","id":"76uimtdi"}
+{"time":"2026-05-23T14:51:24.755456514Z","level":"INFO","msg":"writer: Do: started","stream_id":"76uimtdi"}
+{"time":"2026-05-23T14:51:24.755514294Z","level":"INFO","msg":"handler: started","stream_id":"76uimtdi"}
+{"time":"2026-05-23T14:51:24.755470094Z","level":"INFO","msg":"sender: started","stream_id":"76uimtdi"}
+{"time":"2026-05-23T14:51:25.154503839Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2026-05-23T14:54:23.220234763Z","level":"INFO","msg":"stream: closing","id":"76uimtdi"}
+{"time":"2026-05-23T14:54:23.220287463Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2026-05-23T14:54:23.220377983Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2026-05-23T14:54:24.146700981Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-05-23T14:54:24.483345092Z","level":"INFO","msg":"handler: closed","stream_id":"76uimtdi"}
+{"time":"2026-05-23T14:54:24.483401353Z","level":"INFO","msg":"sender: closed","stream_id":"76uimtdi"}
+{"time":"2026-05-23T14:54:24.483382443Z","level":"INFO","msg":"writer: Close: closed","stream_id":"76uimtdi"}
+{"time":"2026-05-23T14:54:24.483480713Z","level":"INFO","msg":"stream: closed","id":"76uimtdi"}

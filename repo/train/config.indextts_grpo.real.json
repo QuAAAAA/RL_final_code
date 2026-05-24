@@ -20,7 +20,7 @@
   "group_size": 4,
 
   "__HPARAM__max_mel_tokens": "每次取樣最多生成幾個 mel token（限制輸出長度）",
-  "max_mel_tokens": 256,
+  "max_mel_tokens": 600,
 
   "__HPARAM__temperature":  "取樣溫度（越高越多樣，越低越保守）",
   "temperature": 0.85,

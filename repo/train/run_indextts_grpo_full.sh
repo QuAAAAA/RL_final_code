@@ -9,6 +9,10 @@
 
 set -euo pipefail
 
+# nvcc 12.0 does not support sm_120 (Blackwell). Compile for sm_89 + PTX so
+# the GPU driver can JIT-compile to sm_120 at runtime.
+export TORCH_CUDA_ARCH_LIST="8.9+PTX"
+
 ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "${ROOT_DIR}"
 
