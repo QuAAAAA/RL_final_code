@@ -1,0 +1,90 @@
+{
+  "manifest": "/srv/RL_project/repo/outputs/manifest_step1169.json",
+  "output_csv": "/srv/RL_project/repo/outputs/emotion2vec_eval_step1169.csv",
+  "evaluated": 2752,
+  "correct": 666,
+  "accuracy": 0.24200581395348839,
+  "missing_wav": 0,
+  "errors": 0,
+  "by_model": {
+    "indextts_step1169": {
+      "evaluated": 2752,
+      "correct": 666,
+      "accuracy": 0.24200581395348839
+    }
+  },
+  "by_emotion": {
+    "angry": {
+      "evaluated": 394,
+      "correct": 55,
+      "accuracy": 0.13959390862944163
+    },
+    "disgusted": {
+      "evaluated": 393,
+      "correct": 3,
+      "accuracy": 0.007633587786259542
+    },
+    "fearful": {
+      "evaluated": 393,
+      "correct": 2,
+      "accuracy": 0.005089058524173028
+    },
+    "happy": {
+      "evaluated": 393,
+      "correct": 196,
+      "accuracy": 0.49872773536895676
+    },
+    "neutral": {
+      "evaluated": 393,
+      "correct": 354,
+      "accuracy": 0.9007633587786259
+    },
+    "sad": {
+      "evaluated": 393,
+      "correct": 5,
+      "accuracy": 0.01272264631043257
+    },
+    "surprised": {
+      "evaluated": 393,
+      "correct": 51,
+      "accuracy": 0.1297709923664122
+    }
+  },
+  "by_model_emotion": {
+    "indextts_step1169:angry": {
+      "evaluated": 394,
+      "correct": 55,
+      "accuracy": 0.13959390862944163
+    },
+    "indextts_step1169:disgusted": {
+      "evaluated": 393,
+      "correct": 3,
+      "accuracy": 0.007633587786259542
+    },
+    "indextts_step1169:fearful": {
+      "evaluated": 393,
+      "correct": 2,
+      "accuracy": 0.005089058524173028
+    },
+    "indextts_step1169:happy": {
+      "evaluated": 393,
+      "correct": 196,
+      "accuracy": 0.49872773536895676
+    },
+    "indextts_step1169:neutral": {
+      "evaluated": 393,
+      "correct": 354,
+      "accuracy": 0.9007633587786259
+    },
+    "indextts_step1169:sad": {
+      "evaluated": 393,
+      "correct": 5,
+      "accuracy": 0.01272264631043257
+    },
+    "indextts_step1169:surprised": {
+      "evaluated": 393,
+      "correct": 51,
+      "accuracy": 0.1297709923664122
+    }
+  }
+}

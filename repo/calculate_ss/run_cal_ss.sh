@@ -1,4 +1,16 @@
 #!/bin/bash
+<<'EOF'
+cd /srv/RL_project/repo/calculate_ss
+SOURCE_AUDIO=/srv/RL_project/repo/index-tts/examples/prompts/FT0BAE.mp3 \
+MANIFEST=/srv/RL_project/repo/outputs/manifest_indextts.json \
+AUDIO_DIR=/srv/RL_project/repo/outputs/wav_by_model/indextts_try5 \
+./run_cal_ss.sh \
+  --summary-output /srv/RL_project/repo/outputs/wav_by_model/ss_summary_indextts_try5.md \
+  --details-output /srv/RL_project/repo/outputs/wav_by_model/ss_eval_indextts_try5.csv
+
+
+EOF
+
 set -euo pipefail
 
 cd "$(dirname "$0")"

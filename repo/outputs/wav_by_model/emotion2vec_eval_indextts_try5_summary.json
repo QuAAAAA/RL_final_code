@@ -1,0 +1,90 @@
+{
+  "manifest": "/srv/RL_project/repo/outputs/manifest_indextts.json",
+  "output_csv": "/srv/RL_project/repo/outputs/wav_by_model/emotion2vec_eval_indextts_try5.csv",
+  "evaluated": 2752,
+  "correct": 702,
+  "accuracy": 0.2550872093023256,
+  "missing_wav": 0,
+  "errors": 0,
+  "by_model": {
+    "indextts": {
+      "evaluated": 2752,
+      "correct": 702,
+      "accuracy": 0.2550872093023256
+    }
+  },
+  "by_emotion": {
+    "angry": {
+      "evaluated": 394,
+      "correct": 20,
+      "accuracy": 0.050761421319796954
+    },
+    "disgusted": {
+      "evaluated": 393,
+      "correct": 7,
+      "accuracy": 0.017811704834605598
+    },
+    "fearful": {
+      "evaluated": 393,
+      "correct": 4,
+      "accuracy": 0.010178117048346057
+    },
+    "happy": {
+      "evaluated": 393,
+      "correct": 236,
+      "accuracy": 0.6005089058524173
+    },
+    "neutral": {
+      "evaluated": 393,
+      "correct": 333,
+      "accuracy": 0.8473282442748091
+    },
+    "sad": {
+      "evaluated": 393,
+      "correct": 1,
+      "accuracy": 0.002544529262086514
+    },
+    "surprised": {
+      "evaluated": 393,
+      "correct": 101,
+      "accuracy": 0.25699745547073793
+    }
+  },
+  "by_model_emotion": {
+    "indextts:angry": {
+      "evaluated": 394,
+      "correct": 20,
+      "accuracy": 0.050761421319796954
+    },
+    "indextts:disgusted": {
+      "evaluated": 393,
+      "correct": 7,
+      "accuracy": 0.017811704834605598
+    },
+    "indextts:fearful": {
+      "evaluated": 393,
+      "correct": 4,
+      "accuracy": 0.010178117048346057
+    },
+    "indextts:happy": {
+      "evaluated": 393,
+      "correct": 236,
+      "accuracy": 0.6005089058524173
+    },
+    "indextts:neutral": {
+      "evaluated": 393,
+      "correct": 333,
+      "accuracy": 0.8473282442748091
+    },
+    "indextts:sad": {
+      "evaluated": 393,
+      "correct": 1,
+      "accuracy": 0.002544529262086514
+    },
+    "indextts:surprised": {
+      "evaluated": 393,
+      "correct": 101,
+      "accuracy": 0.25699745547073793
+    }
+  }
+}

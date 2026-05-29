@@ -1,0 +1,44 @@
+\section{Empirical Evaluation}
+\label{section:evaluation}
+To rigorously evaluate the effectiveness of our proposed RL-enhanced IndexTTS2 framework in preserving and recovering emotional expressiveness during transfer from a high-resource language to a low-resource language, we employ a combination of objective and subjective evaluations.
+
+\subsection{Performance Metrics}
+We plan to adopt several key performance metrics to comprehensively assess speech intelligibility, speaker fidelity, emotional expressiveness, and emotion retention after low-resource adaptation.
+\begin{itemize}
+    \item \textbf{Objective Metrics}:
+    \begin{itemize}
+        \item \textbf{Word Error Rate (WER)}: Evaluates speech intelligibility and articulation accuracy using ASR models like FunASR \citep{2025arXiv250912508A} or Whisper \citep{Radford2022RobustSR}.
+        \item \textbf{Speaker Similarity (SS)}: Computed as the cosine similarity between speaker embeddings extracted from a pretrained speaker recognition model to ensure the timbre is maintained after low-resource adaptation and RL optimization.
+        \item \textbf{Speech Emotion Recognition (SER)}: Measured using the open-source emotion2vec model to objectively verify if the generated speech matches the target emotion category.
+        % \item \textbf{Emotion Retention Gap (ERG)}: Let $M$ denote an emotion-related metric such as Emotion Similarity or Emotion MOS. We define $\mathrm{ERG} = (M_{\text{base}} - M_{\text{adapt}}) / M_{\text{base}}$ to quantify the relative emotional degradation after low-resource adaptation, and additionally report the recovery ratio $(M_{\text{ours}} - M_{\text{adapt}}) / (M_{\text{base}} - M_{\text{adapt}})$ to measure how much of the lost emotional capability is restored by our method.
+    \end{itemize}
+    \item \textbf{Subjective Metrics (MOS Framework)}:
+    \begin{itemize}
+        \item \textbf{Multidimensional MOS}: We will conduct human evaluations based on a 1-5 scale for Similarity MOS ($\uparrow$), Intelligibility MOS ($\uparrow$), and Naturalness MOS ($\uparrow$).
+        % \item \textbf{Emotion Intensity Test (EIT)}: A pairwise comparison task where listeners identify the stronger emotional sample among weak, medium, and strong synthesized speech. 
+        % \item \textbf{Emphasis Accuracy Test (EAT)}: Assesses the consistency between the model's predicted emphasis positions (local prosody) and those perceived by human listeners.
+    \end{itemize}
+\end{itemize}
+% The combination of EIT and EAT is crucial as our RL method explicitly optimizes for fine-grained intensity and local emphasis, which standard MOS cannot fully capture.
+
+\subsection{Baseline Methods}
+We compare our method against several baselines to explicitly quantify emotional forgetting and emotional recovery during low-resource adaptation.
+\begin{itemize}
+    \item \textbf{CosyVoice2} \citep{Du2024CosyVoice2S}: A strong text-to-speech baseline fine-tuned on the target low-resource language for cross-model comparison.
+    \item \textbf{CosyVoice3} \citep{2025arXiv250517589D}: An improved model built upon CosyVoice2, which is also fine-tuned on the target data to evaluate cross-lingual generalization and speech generation quality.
+    \item \textbf{IndexTTS2 + Naive Low-Resource Fine-Tuning}: A baseline that fine-tunes IndexTTS2 on limited target-language data without any explicit preservation mechanism, used to measure the severity of emotional forgetting.
+    \item \textbf{IndexTTS2 + Parameter-Efficient Adaptation}: A target-language adaptation baseline using a lightweight adaptation strategy, used to test whether preserving more pretrained parameters helps retain emotional expressiveness.
+    \item \textbf{IndexTTS2 + Parameter-Efficient Adaptation + RL (Ours)}: Our full method, which applies RL-based emotional and prosodic alignment after low-resource adaptation.
+    % \item \textbf{MaskGCT} \citep{Wang2024MaskGCTZT}: A zero-shot text-to-speech model utilizing a masked generative codec transformer for non-autoregressive synthesis.
+    % \item \textbf{F5-TTS} \citep{Chen2024F5TTSAF}: A flow-matching based non-autoregressive TTS model known for fluent and faithful speech generation.
+    % \item \textbf{Spark-TTS} \citep{Wang2025SparkTTSAE}: An efficient LLM-based TTS model that utilizes single-stream decoupled speech tokens.
+    % \item \textbf{EmoSphere++} \citep{Cho2024EmoSphereEZ}: An emotion-controllable zero-shot TTS baseline that models emotions via an emotion-adaptive spherical vector.
+\end{itemize}
+
+\subsection{Benchmark Datasets}
+To train the low-resource adaptation model and evaluate catastrophic forgetting of emotional expressiveness, we employ the following datasets:
+\begin{itemize}
+    \item \textbf{Emotion Supervision Data}: We utilize the Emotional Speech Database (ESD) and the Expresso dataset, which provide annotations for discrete emotions, continuous intensities, and emphasis. These serve as supervision signals for RL-based emotional realignment training.
+    \item \textbf{Taiwanese Across Taiwan Corpus (TAT)} \citep{Liao2022TATMOE}: A NAER-hosted large-scale native Taiwanese speech corpus. We utilize the TAT-MOE subset, containing approximately 200 hours of recordings, as the training set for low-resource fine-tuning. For validation and testing, we use the evaluation and test sets from TAT Volume 1 (TAT-Vol1), each comprising approximately 5 hours of data.
+    % \item \textbf{Low-Resource Adaptation Task}: The target-language adaptation scenario is instantiated with Chinese as the high-resource source language and Taiwanese as the low-resource target language.
+\end{itemize}

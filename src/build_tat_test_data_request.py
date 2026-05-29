@@ -9,10 +9,16 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 API_URL = "http://tts001.bronci.com.tw:8802/run/predict"
 RATE_LIMIT_MSG = "請求過於頻繁"
-REQUEST_DELAY = 2  # seconds between every request
+
+_request_count = 0
 
 
 def translate_hanji_to_zh(text: str) -> str:
+    global _request_count
+    _request_count += 1
+    if _request_count % 11 == 0:
+        time.sleep(5)
+
     data = {
         "data": ["", text, "taigi_tw_zh"],
         "event_data": None,
@@ -32,7 +38,6 @@ def translate_hanji_to_zh(text: str) -> str:
                         time.sleep(wait)
                         wait = min(wait * 2, 60)
                         continue
-                    time.sleep(REQUEST_DELAY)
                     return text_result
         except Exception as e:
             print(f"[ERROR] ({text[:20]}...): {e}", flush=True)

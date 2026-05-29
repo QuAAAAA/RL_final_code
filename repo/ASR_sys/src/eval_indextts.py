@@ -2,10 +2,14 @@
 Evaluate Whisper ASR on TTS-generated wav files from manifest_all.json.
 Run from project root: uv run python tatmoe/eval_indextts.
 
-uv run python tatmoe/eval_indextts.py \
+uv run python src/eval_indextts.py \
+  --wav_dir /srv/RL_project/repo/outputs/step_1169.pth/ \
+  --json /srv/RL_project/repo/outputs/manifest_step1169.json \
+  --model_name indextts_step1169 \
+  --manifest_out ./src/eval_indextts_manifest_step1169.csv \
   --model ./ASR/whisper-large-v3-turbo-finetuned-pinyin \
   --processor ./ASR/whisper-large-v3-turbo-finetuned-pinyin \
-  --output ./tatmoe/results_indextts_turbo_pinyin_top_db_20.csv \
+  --output ./src/results_indextts_turbo_pinyin_top_db_20.csv \
   --trim_top_db 20.0
 
 """

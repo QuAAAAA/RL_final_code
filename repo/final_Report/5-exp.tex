@@ -1,0 +1,115 @@
+% \section{Preliminary Results}
+\section{Midterm Experimental Results}
+\label{section:exp}
+
+In this section, we present a toy-example diagnostic experiment designed to illustrate the limitations of the baseline systems, CosyVoice2 and CosyVoice3 (CV2/CV3), on Taiwanese emotional TTS. Rather than serving as a full final evaluation, this experiment uses a controlled synthesis setup to expose the trade-offs between intelligibility, emotion controllability, and speaker fidelity. We compare these baselines with IndexTTS2, our current method in this midterm study, to show that the proposed direction can more effectively handle the observed baseline weaknesses, especially in preserving intelligibility while enabling stronger emotional variation.
+
+\subsection{Preliminary Baseline Evaluation}
+\label{section:exp:setup}
+\label{section:exp:baseline}
+As an initial pilot study, we conducted a subjective evaluation to establish a preliminary baseline for Taiwanese TTS. The evaluation used the Mean Opinion Score (MOS) on a scale from 1 to 5 (where 5 represents the best performance). The evaluation panel consisted of 12 members from the SARC laboratory. The test corpus involved 20 sentences for evaluating speech intelligibility and naturalness, and an additional 10 sentences specifically for evaluating voice similarity. In total, the subjective evaluation yielded 600 rating samples ((20 * 2 + 10) test items $\times$ 12 evaluators).
+
+Table \ref{tab:taiwanese_mos} shows the preliminary subjective evaluation results of the baseline method, CosyVoice2~\citep{Du2024CosyVoice2S}, on Taiwanese TTS. The model achieves a similarity MOS of 4.16, an intelligibility MOS of 4.41, and a naturalness MOS of 4.37, resulting in an overall mean MOS of 4.31. These results suggest that a strong off-the-shelf baseline can already generate high-quality Taiwanese speech. This observation motivates our project to move beyond basic intelligibility and naturalness, and to focus on whether emotional expressiveness can be preserved and recovered during low-resource adaptation.
+
+\begin{table}[htbp]
+\centering
+\caption{Preliminary Subjective Evaluation (MOS) on Taiwanese TTS.}
+\label{tab:taiwanese_mos}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Similarity MOS $\uparrow$} & \textbf{Intelligibility MOS $\uparrow$} & \textbf{Naturalness MOS $\uparrow$} & \textbf{Mean $\uparrow$} \\
+\midrule
+CosyVoice2 & 4.16 & 4.41 & 4.37 & 4.31 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Evaluation Synthesis Protocol}
+\label{section:exp:synthesis}
+To compare emotional expressiveness across models on Taiwanese, we synthesized a large-scale evaluation corpus from the TAT-Vol1 texts (2,752 utterances). All systems were conditioned on the same fixed reference speaker audio(a single Taiwanese speaker) to control for speaker identity; only the emotion label was varied across the seven target categories: \textit{angry}, \textit{happy}, \textit{fearful}, \textit{disgusted}, \textit{sad}, \textit{surprised}, and \textit{neutral}. Emotion labels were assigned in a balanced, shuffled order across utterances (random seed fixed at 42 for reproducibility). Table~\ref{tab:synthesis_stats} summarizes the inference setup and generation statistics for each system.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Evaluation synthesis statistics for the three TTS models on 2,752 TAT-Vol1 utterances.}
+\label{tab:synthesis_stats}
+\begin{tabular}{llccc}
+\toprule
+\textbf{Model} & \textbf{Emotion Control} & \textbf{Audio Duration} & \textbf{Failures} \\
+\midrule
+CosyVoice2   & Text prompt   & 07:53:41 & 39 \\
+CosyVoice3   & Text prompt   & 09:48:08 & 5  \\
+IndexTTS2    & 8-dim vector  & 09:21:57 & 0  \\
+\midrule
+\textbf{Total} & & \textbf{27:04:06} & \textbf{44} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Speech Emotion Recognition (SER)}
+\label{section:exp:ser}
+To evaluate whether the intended emotion is recognizable in the synthesized speech, we apply the \texttt{emotion2vec} speech emotion recognition (SER) model to the generated utterances and report the average recognition score for each target emotion. Results are summarized in Table~\ref{tab:ser_by_emotion}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Speech Emotion Recognition (SER) scores broken down by target emotion.}
+\label{tab:ser_by_emotion}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Model} & \textbf{Mean} & \textbf{Neutral} & \textbf{Angry} & \textbf{Happy} & \textbf{Sad} & \textbf{Surprise} & \textbf{Fear} & \textbf{Disgust} \\
+\midrule
+CosyVoice2 & 0.14 & 0.96 & 0.00 & 0.02 & 0.02 & 0.00 & 0.00 & 0.01 \\
+CosyVoice3 & 0.13 & 0.67 & 0.00 & 0.05 & 0.14 & 0.02 & 0.00 & 0.03 \\
+IndexTTS2 & 0.22 & 0.98 & 0.13 & 0.27 & 0.01 & 0.15 & 0.00 & 0.01 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Word Error Rate (WER)}
+\label{section:exp:wer}
+We transcribe each synthesized utterance using a locally hosted \texttt{faster-whisper-}\allowbreak\texttt{taigi-pinyin-}\allowbreak\texttt{large-v7} model, a Whisper-large checkpoint fine-tuned for Taiwanese pinyin transcription. Both the reference (TAT-Vol1) text and the ASR hypothesis are normalized before scoring: hyphens and punctuation (\texttt{-.,!?}) are stripped, whitespace is collapsed, and both strings are lowercased. For analysis and debugging, the output CSV keeps both the original reference/transcription strings and their normalized forms; all WER scores are computed using the normalized \texttt{label\_clean} and \texttt{transcription\_clean} fields. Word-level edit-distance statistics (hits, substitutions, deletions, insertions) are then computed via the \texttt{jiwer} library. We report average per-utterance WER across the full evaluation set and broken down by target emotion. Failed-generation cases (\textit{Missing}) are excluded. Because Taiwanese romanization ASR remains imperfect, the absolute WER values should be interpreted as a diagnostic proxy rather than as fully reliable intelligibility scores. Nevertheless, all systems are evaluated with the same ASR and normalization pipeline, so the relative comparison is still informative. Results are summarized in Table~\ref{tab:wer_results}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Word Error Rate (WER) across the full synthesized corpus and broken down by target emotion.}
+\label{tab:wer_results}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Model} & \textbf{Mean} & \textbf{Neu.} & \textbf{Ang.} & \textbf{Hap.} & \textbf{Sad} & \textbf{Sur.} & \textbf{Fea.} & \textbf{Dis.} \\
+\midrule
+CosyVoice2 & 1.6663 & 1.6392 & 1.6884 & 1.6565 & 1.6570 & 1.6879 & 1.6483 & 1.6865 \\
+CosyVoice3 & 2.1102 & 2.1140 & 2.1374 & 2.0907 & 2.0798 & 2.1003 & 2.1413 & 2.1077 \\
+IndexTTS2 & 1.5089 & 1.5756 & 1.5189 & 1.4641 & 1.5187 & 1.5745 & 1.4617 & 1.4488 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Speaker Similarity (SS)}
+\label{section:exp:ss}
+Speaker embeddings are extracted using SpeechBrain's ECAPA-TDNN encoder pre-trained on VoxCeleb (\texttt{speechbrain/spkrec-ecapa-voxceleb}). Each audio file is mono-mixed and resampled to 16\,kHz before being encoded. Speaker Similarity (SS) is then defined as the cosine similarity between the embedding of the synthesized audio and that of a fixed reference recording (a single Taiwanese speaker), so that SS measures how well each model preserves the target timbre across all synthesized emotional variants. Because emotional rendering perturbs the acoustic features used by the speaker encoder, we report both the corpus-wide mean and the emotion-wise breakdown in Table~\ref{tab:ss_by_emotion}.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Speaker Similarity (SS) across the full synthesized corpus and broken down by target emotion.}
+\label{tab:ss_by_emotion}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccccccccc}
+\toprule
+\textbf{Model} & \textbf{Eval.} & \textbf{Mean} & \textbf{Neu.} & \textbf{Ang.} & \textbf{Hap.} & \textbf{Sad} & \textbf{Sur.} & \textbf{Fea.} & \textbf{Dis.} \\
+\midrule
+CosyVoice2 & 2713 & 0.5812 & 0.5877 & 0.5864 & 0.5761 & 0.5903 & 0.5773 & 0.5711 & 0.5793 \\
+CosyVoice3 & 2747 & 0.5725 & 0.5699 & 0.5749 & 0.5747 & 0.5718 & 0.5698 & 0.5715 & 0.5751 \\
+IndexTTS2 & 2752 & 0.4716 & 0.5616 & 0.3246 & 0.5005 & 0.4860 & 0.4358 & 0.4907 & 0.5023 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Conclusion.} 
+This toy-example experiment highlights the main weakness of the CosyVoice baselines: although CosyVoice2 and CosyVoice3 preserve speaker timbre more consistently, they produce higher ASR-based word error rates and weaker emotion recognition scores for most non-neutral emotions. As shown in Table~\ref{tab:wer_results}, despite the limitations of the Taiwanese romanization ASR system, IndexTTS2 obtains the lowest mean WER (1.5089) under the same evaluation pipeline and remains consistently lower than the CosyVoice baselines across most target emotions. The SER results in Table~\ref{tab:ser_by_emotion} also show that IndexTTS2 obtains the highest mean emotion recognition score (0.22), suggesting that it better addresses the emotional controllability issue exposed by the CV2/CV3 baselines.
+
+Table~\ref{tab:ss_by_emotion} further reveals the remaining trade-off. IndexTTS2 obtains the lowest average SS (0.4716), with a particularly large drop for high-arousal emotions such as Anger (0.3246), suggesting that stronger emotional rendering can perturb the acoustic features used by the ECAPA-TDNN speaker encoder. Overall, this small experiment supports the motivation of our approach: compared with the baseline systems, IndexTTS2 more effectively handles intelligibility and emotional expression, while speaker identity preservation remains an important constraint. In the next stage, the base models examined in these toy examples will serve as the foundation for our RL-based realignment experiments, where we will focus on further strengthening emotional controllability and intelligibility.
