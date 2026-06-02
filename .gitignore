@@ -30,6 +30,11 @@ repo/w2v2-how-to/
 # generated report asset
 repo/final_Report/asset/arc0-architecture.pdf
 
+# nested model artifacts
+repo/ASR_sys/ASR/faster-whisper-pinyin/model/
+repo/ASR_sys/ASR/whisper-large-v3-turbo-finetuned-pinyin/
+repo/train/models/
+
 # model/checkpoint artifacts
 *.npy
 *.npz
