@@ -1,17 +1,17 @@
 # Fdb version 4
-["bibtex proposal"] 1778134568.20409 "proposal.aux" "proposal.bbl" "proposal" 1778134571.10032 0
-  "./reference.bib" 1775671030.83239 9511 f51b3af16fe6bd74b020066f315f1c28 ""
+["bibtex proposal"] 1780387063.84616 "proposal.aux" "proposal.bbl" "proposal" 1780387064.16319 0
+  "./reference.bib" 1780058034.37054 9511 f51b3af16fe6bd74b020066f315f1c28 ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/natbib/unsrtnat.bst" 1233624470 24550 a41a6405f4de768c43e871d9fbce2bc8 ""
-  "proposal.aux" 1778134571.05725 9423 b278a8e803d367f850fe112c79422081 "pdflatex"
+  "proposal.aux" 1780387064.11822 9423 cbe6acee83c61be2a6fb55c248f5b10d "pdflatex"
   (generated)
   "proposal.bbl"
   "proposal.blg"
   (rewritten before read)
-["pdflatex"] 1778134570.80018 "/srv/RL_project/repo/Midterm_Report/proposal.tex" "proposal.pdf" "proposal" 1778134571.10044 0
+["pdflatex"] 1780387063.85762 "/srv/RL_project/repo/final_Report/proposal.tex" "proposal.pdf" "proposal" 1780387064.1633 0
   "/etc/texmf/web2c/texmf.cnf" 1773062606.20639 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/ben/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0900.600pk" 1775408140.60169 17492 e20cec2ef2b7d2f4291db5a42326e758 ""
   "/home/ben/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk" 1775407923.99782 20008 6ece83d4fd6ae28af468a5439bd404ff ""
-  "/srv/RL_project/repo/Midterm_Report/proposal.tex" 1777903740.11537 2591 da22448d055c5484c999d3da03822bf9 ""
+  "/srv/RL_project/repo/final_Report/proposal.tex" 1780058034.37054 2591 da22448d055c5484c999d3da03822bf9 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb8r.tfm" 1136768653 4524 6bce29db5bc272ba5f332261583fee9c ""
@@ -133,18 +133,18 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1773331718.37267 230484 b5ecf1e2279bd656c2c0037689af4d45 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1773331724 6898742 f29cf9cfc934ae712488d4bfc3a9de41 ""
-  "1-overview.tex" 1778071480.16682 5021 e73e1134a50d9225a3bbb6e86d4a4d79 ""
-  "2-formulation.tex" 1775670790.51645 2289 65604d6a31e9d43d801f64ef5820753a ""
-  "3-evaluation.tex" 1778069863.81475 5641 884307d85dac0568f37f3484d757eafe ""
-  "4-method.tex" 1775666752.37977 4979 d36375c33b1767e3fc8b79416b047d65 ""
-  "5-exp.tex" 1778072032.12147 9987 12e37cbfb2bdc10fb96a6a16a6185c49 ""
-  "6-contribution.tex" 1778134570.47225 758 4d870a2d453b58d3c8ef7460686c47b3 ""
-  "asset/architecture.pdf" 1778071280.27629 2616494 521a9fec12afdb2f2e55d511fbbbdf3b ""
-  "neurips_2020.sty" 1775033843.22915 11309 0a12e5896af9b3e64d2bb3e796c5eb0a ""
-  "proposal.aux" 1778134571.05725 9423 b278a8e803d367f850fe112c79422081 "pdflatex"
-  "proposal.bbl" 1778134568.21225 5464 245882914418152776fad76c762bc45a "bibtex proposal"
-  "proposal.out" 1778134571.05725 3651 bb9c0870b16f87adae22b12d62a6c28d "pdflatex"
-  "proposal.tex" 1777903740.11537 2591 da22448d055c5484c999d3da03822bf9 ""
+  "1-overview.tex" 1780058034.34854 5021 e73e1134a50d9225a3bbb6e86d4a4d79 ""
+  "2-formulation.tex" 1780058034.34954 2289 65604d6a31e9d43d801f64ef5820753a ""
+  "3-evaluation.tex" 1780058034.35054 5641 884307d85dac0568f37f3484d757eafe ""
+  "4-method.tex" 1780058034.35054 4979 d36375c33b1767e3fc8b79416b047d65 ""
+  "5-exp.tex" 1780387063.26523 10075 2d3f9ead63f45ce09c0d8f6113c9de13 ""
+  "6-contribution.tex" 1780058034.35154 758 4d870a2d453b58d3c8ef7460686c47b3 ""
+  "asset/architecture.pdf" 1780143478.74352 2451492 f2fba2fdcb7732840179df0f597761d4 ""
+  "neurips_2020.sty" 1780058034.36554 11309 0a12e5896af9b3e64d2bb3e796c5eb0a ""
+  "proposal.aux" 1780387064.11822 9423 cbe6acee83c61be2a6fb55c248f5b10d "pdflatex"
+  "proposal.bbl" 1780387063.85522 5464 245882914418152776fad76c762bc45a "bibtex proposal"
+  "proposal.out" 1780387064.11922 3651 bb9c0870b16f87adae22b12d62a6c28d "pdflatex"
+  "proposal.tex" 1780058034.37054 2591 da22448d055c5484c999d3da03822bf9 ""
   (generated)
   "proposal.aux"
   "proposal.log"

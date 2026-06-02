@@ -1,9 +1,9 @@
-PWD /srv/RL_project/repo/Midterm_Report
+PWD /srv/RL_project/repo/final_Report
 INPUT /etc/texmf/web2c/texmf.cnf
 INPUT /usr/share/texmf/web2c/texmf.cnf
 INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf
 INPUT /var/lib/texmf/web2c/pdftex/pdflatex.fmt
-INPUT /srv/RL_project/repo/Midterm_Report/proposal.tex
+INPUT /srv/RL_project/repo/final_Report/proposal.tex
 OUTPUT proposal.log
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
 INPUT /usr/share/texlive/texmf-dist/tex/latex/base/article.cls
