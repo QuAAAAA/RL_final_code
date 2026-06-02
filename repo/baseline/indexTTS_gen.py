@@ -13,7 +13,7 @@ uv run python ../baseline/indexTTS_gen.py \
 
 # JSONL with TaggedText / Quadruplet VA:
 uv run python ../baseline/indexTTS_gen.py \
-    --input ../train/nemo_rl_data/tts_va_train.jsonl \
+    --input /srv/RL_project/repo/baseline/ensemble_tat_test_task3_least.jsonl \
     --input-format jsonl \
     --text-mode tagged \
     --emotion-mode auto \
@@ -113,6 +113,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--repetition-penalty", type=float, default=10.0)
     p.add_argument("--length-penalty", type=float, default=0.0)
     p.add_argument("--interval-silence", type=int, default=200)
+    p.add_argument("--duration-seconds", type=float, default=10.0,
+                   help="Target duration (s) for generated audio; enables the engine's internal "
+                        "length planning (matches run_inference.sh). Use <=0 / None to disable.")
     p.add_argument("--model-name", default="indextts", help="Short model name recorded in manifest and filenames.")
     p.add_argument("--manifest", default=None, help="Path to manifest JSON. Defaults to <output-root>/manifest.json.")
     p.add_argument("--trim-top-db", type=float, default=40.0, help="Silence trim threshold in dB (default: 40).")
@@ -404,6 +407,22 @@ def save_manifest(manifest_path: Path, records: list, model: str) -> None:
     manifest_path.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def apply_seed(seed: Optional[int]) -> None:
+    """Seed python / numpy / torch so sampling is reproducible (mirrors inference_script.py)."""
+    if seed is None:
+        return
+    import numpy as np
+    import torch
+
+    py_seed = int(seed % (2**32))
+    random.seed(py_seed)
+    np.random.seed(py_seed)
+    torch_seed = int(seed % (2**63 - 1))
+    torch.manual_seed(torch_seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(torch_seed)
+
+
 def main() -> None:
     args = parse_args()
     random.seed(args.seed)
@@ -500,6 +519,10 @@ def main() -> None:
             records.append(record_for_task(i, task, args.model_name, out_path.name, dur, vec, va_alpha, input_format))
             continue
 
+        # Reseed per utterance so each one starts from the same RNG state, regardless of
+        # batch position (matches batch_indexTTS.sh's per-process --seed; resume-independent).
+        apply_seed(args.seed)
+
         success = False
         for attempt in range(1, args.retry_count + 2):
             try:
@@ -509,6 +532,7 @@ def main() -> None:
                     output_path=str(out_path),
                     emo_vector=vec,
                     interval_silence=args.interval_silence,
+                    duration_seconds=args.duration_seconds,
                     max_text_tokens_per_sentence=args.max_text_tokens,
                     skip_normalizer=True,
                     **generation_kwargs,
