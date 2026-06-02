@@ -20,6 +20,15 @@ TAT-Vol2/
 /models/
 checkpoints/
 repo/outputs/
+repo/Gym/
+repo/RL/
+repo/RL_Final_Project/
+repo/emotion2vec/
+repo/index-tts/
+repo/w2v2-how-to/
+
+# generated report asset
+repo/final_Report/asset/arc0-architecture.pdf
 
 # model/checkpoint artifacts
 *.npy
