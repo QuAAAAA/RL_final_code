@@ -1,14 +1,47 @@
 /data/
 arc
 /logs/
+wandb/
+outputs/
 .venv/
+node_modules/
 hf_cache/
 .claude/
 __pycache__/
 
 .pytest_cache/
+.ipynb_checkpoints/
 
 # dataset
-*wav
+*.wav
 TAT-Vol1/
 TAT-Vol2/
+
+/models/
+checkpoints/
+repo/outputs/
+
+# model/checkpoint artifacts
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.onnx
+*.nemo
+
+# logs/cache
+*.log
+.DS_Store
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.synctex(busy)
