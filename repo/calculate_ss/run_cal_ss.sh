@@ -2,11 +2,11 @@
 <<'EOF'
 cd /srv/RL_project/repo/calculate_ss
 SOURCE_AUDIO=/srv/RL_project/repo/index-tts/examples/prompts/FT0BAE.mp3 \
-MANIFEST=/srv/RL_project/repo/outputs/manifest_indextts_va.json \
-AUDIO_DIR=/srv/RL_project/repo/outputs/wav_by_model/indextts_va \
+MANIFEST=/srv/RL_project/repo/outputs/indexTTS_FT_va_emphasis/manifest_indexTTS_FT_va_emphasis.json \
+AUDIO_DIR=/srv/RL_project/repo/outputs/indexTTS_FT_va_emphasis/wav \
 ./run_cal_ss.sh \
-  --summary-output /srv/RL_project/repo/outputs/wav_by_model/ss_summary_indextts_va.md \
-  --details-output /srv/RL_project/repo/outputs/wav_by_model/ss_eval_indextts_va.csv
+  --summary-output /srv/RL_project/repo/outputs/indexTTS_FT_va_emphasis/ss_summary_indextts_FT_va_emphasis.md \
+  --details-output /srv/RL_project/repo/outputs/indexTTS_FT_va_emphasis/ss_eval_indextts_FT_va_emphasis.csv
 
 
 EOF

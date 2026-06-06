@@ -30,6 +30,18 @@ from eval import transcribe_batch
 from strip_tones import strip_tl_tones
 
 
+# (emotion key in manifest, LaTeX column abbreviation)
+EMOTION_ORDER = [
+    ('neutral', 'Neu.'),
+    ('angry', 'Ang.'),
+    ('happy', 'Hap.'),
+    ('sad', 'Sad'),
+    ('surprised', 'Sur.'),
+    ('fearful', 'Fea.'),
+    ('disgusted', 'Dis.'),
+]
+
+
 def main():
     parser = argparse.ArgumentParser(description='Evaluate ASR on TTS-generated wavs')
     parser.add_argument('--json', default='./data/wav_gen/manifest_indextts.json')
@@ -54,14 +66,25 @@ def main():
     entries = [e for e in entries if e['model'] == args.model_name]
     print(f'Entries ({args.model_name}): {len(entries)}')
 
+    # The reference for WER must be the text that was ACTUALLY synthesized, i.e. the
+    # Taigi pinyin string fed to engine.infer (`synthesis_text` in the manifest, see
+    # baseline/indexTTS_gen.py). The `text` field may be the original, un-translated
+    # Han characters and would give a meaningless WER. Older manifests have no
+    # `synthesis_text` and their `text` is already pinyin, so we fall back to `text`.
     rows = []
+    n_from_synth = 0
     for e in entries:
+        ref = e.get('synthesis_text') or e['text']
+        if e.get('synthesis_text'):
+            n_from_synth += 1
         rows.append({
             'index': e['index'],
             'wav_path': os.path.join(args.wav_dir, e['file']),
-            'ground_truth': strip_tl_tones(e['text']),
+            'ground_truth_raw': ref,
+            'ground_truth': strip_tl_tones(ref),
             'emotion': e.get('emotion', ''),
         })
+    print(f'Reference source: synthesis_text={n_from_synth}, text(fallback)={len(rows) - n_from_synth}')
 
     df = pd.DataFrame(rows)
     os.makedirs(os.path.dirname(args.manifest_out), exist_ok=True)
@@ -88,21 +111,34 @@ def main():
         remove_internal_silence=args.remove_internal_silence,
     )
 
-    df['prediction'] = predictions
+    # Normalize predictions the SAME way as ground_truth (strip_tl_tones already
+    # applied to ground_truth above). Without this, a cleaned reference would be
+    # scored against a raw hypothesis (tones/hyphens/punct/case) -> inflated WER.
+    df['prediction_raw'] = predictions
+    df['prediction'] = [strip_tl_tones(p) for p in predictions]
     df['lev_distance'] = [
         levenshtein_distance(p, g)
-        for p, g in zip(predictions, df['ground_truth'])
+        for p, g in zip(df['prediction'], df['ground_truth'])
     ]
-
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    df.to_csv(args.output, index=False)
 
     refs = df['ground_truth'].tolist()
     hyps = df['prediction'].tolist()
 
+    # Per-utterance WER, used both for the overall average and the per-emotion split.
+    df['wer'] = [compute_wer(g, p) for g, p in zip(refs, hyps)]
+
+    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    df.to_csv(args.output, index=False)
+
     mld = df['lev_distance'].mean()
     corpus_wer = compute_wer(refs, hyps)
-    avg_wer = sum(compute_wer(r, h) for r, h in zip(refs, hyps)) / len(refs)
+    avg_wer = df['wer'].mean()
+
+    # Per-emotion average WER (NaN -> None when an emotion has no samples).
+    per_emotion = {}
+    for emo, _ in EMOTION_ORDER:
+        sub = df.loc[df['emotion'] == emo, 'wer']
+        per_emotion[emo] = sub.mean() if len(sub) else None
 
     print(f'\n{"=" * 50}')
     print(f'Model        : {args.model_name}')
@@ -111,6 +147,29 @@ def main():
     print(f'Corpus WER   : {corpus_wer:.4f}   ({corpus_wer*100:.2f}%)')
     print(f'Average WER  : {avg_wer:.4f}   ({avg_wer*100:.2f}%)')
     print(f'Output       : {args.output}')
+    print(f'{"=" * 50}')
+
+    # Per-emotion sample counts.
+    print('Samples per emotion:')
+    for emo, _ in EMOTION_ORDER:
+        print(f'  {emo:<10}: {(df["emotion"] == emo).sum()}')
+
+    # LaTeX table: Model & Mean & Neu. & Ang. & Hap. & Sad & Sur. & Fea. & Dis.
+    def fmt(v):
+        return f'{v:.4f}' if v is not None else ''
+
+    header = ' & '.join(
+        [r'\textbf{Model}', r'\textbf{Mean}']
+        + [rf'\textbf{{{abbr}}}' for _, abbr in EMOTION_ORDER]
+    ) + r' \\'
+    values = [fmt(avg_wer)] + [fmt(per_emotion[emo]) for emo, _ in EMOTION_ORDER]
+    row = f'{args.model_name} & ' + ' & '.join(values) + r' \\'
+
+    print(f'\n{"=" * 50}')
+    print('Per-emotion WER (LaTeX):')
+    print(header)
+    print(r'\midrule')
+    print(row)
     print(f'{"=" * 50}')
     print(df[['prediction', 'ground_truth', 'lev_distance']].head(10).to_string(index=False))
 

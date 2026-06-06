@@ -2,25 +2,34 @@
 """Direct batch inference using IndexTTS2 (loads model once, no Gradio server needed).
 Generates all texts in a Kaldi text file or VA/tagged JSONL with emotion controls.
 Prints wall time and total audio duration at the end.
+--gpt-checkpoint /srv/RL_project/repo/train/runs/try8_arc/merged_top5_167-586.pth \
+# JSONL with TaggedText / Quadruplet VA:
 
 cd /srv/RL_project/repo/index-tts
-uv run python ../baseline/indexTTS_gen.py \
-    --input ../baseline/text_origin \
-    --gpt-checkpoint /srv/RL_project/repo/train/runs/try7_arc/top_reward_161-456.pth \
-    --output-root ../outputs/wav_by_model/indextts_try7 \
-    --manifest ../outputs/manifest_indextts_try7.json \
-    --index-tts-dir .
-
-# JSONL with TaggedText / Quadruplet VA:
 uv run python ../baseline/indexTTS_gen.py \
     --input /srv/RL_project/repo/baseline/ensemble_tat_test_task3_least.jsonl \
     --input-format jsonl \
     --text-mode tagged \
-    --emotion-mode auto \
-    --output-root ../outputs/wav_by_model/indextts_va \
-    --manifest ../outputs/manifest_indextts_va.json \
+    --translate-tagged \
+    --emotion-mode random \
+    --seed 42 \
+    --gpt-checkpoint /srv/RL_project/models/IndexTTS_trained/GPTs/trained_200hr_4e_step202000.pth \
+    --output-root ../outputs/indexTTS_FT_va_emphasis/wav \
+    --manifest ../outputs/indexTTS_FT_va_emphasis/manifest_indexTTS_FT_va_emphasis.json \
     --index-tts-dir .
 
+生成baseline(不用va和重音)，直接給text_origin
+cd /srv/RL_project/repo/index-tts
+uv run python ../baseline/indexTTS_gen.py \
+    --input /srv/RL_project/repo/baseline/text_origin \
+    --input-format kaldi \
+    --emotion-mode random \
+    --seed 42 \
+    --gpt-checkpoint /srv/RL_project/models/IndexTTS_trained/GPTs/trained_200hr_4e_step202000.pth \
+    --output-root ../outputs/indexTTS_FT \
+    --manifest ../outputs/indexTTS_FT/manifest_indexTTS_FT.json \
+    --index-tts-dir .
+    
 Notes:
 IndexTTS，耗時: wall=01:56:45 (7005.6s)
 共2752筆資料，生成資料集總長: 09:21:57 (33717.5s)
@@ -43,17 +52,13 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-try:
-    from trim_silence import trim_wav as trim_silence
-    TRIM_IMPORT_ERROR = None
-except Exception as exc:
-    trim_silence = None
-    TRIM_IMPORT_ERROR = exc
 
 logging.disable(logging.WARNING)
 os.environ.setdefault("INDEXTTS_USE_DEEPSPEED", "0")
 
 EMOTIONS = ["angry", "happy", "fearful", "disgusted", "sad", "surprised", "neutral"]
+
+_VA_LAMBDA = 0.4
 
 # 8-dim vector: [joy, anger, sadness, fear, disgust, low_mood, surprise, neutral]
 EMOTION_VECTORS: Dict[str, List[float]] = {
@@ -81,6 +86,18 @@ def parse_args() -> argparse.Namespace:
         default="tagged",
         help="For JSONL input, generate from Text or TaggedText (default: tagged).",
     )
+    p.add_argument(
+        "--translate-tagged",
+        action="store_true",
+        help='Translate the (tagged) generation text to Taigi pinyin while keeping the '
+             '"..." emphasis quotes, matching GRPO training. Use for Han-character JSONL input; '
+             "do NOT use when the input is already romanised (e.g. Kaldi text_origin).",
+    )
+    p.add_argument("--translation-mode", default="taigi_zh_tw_py",
+                   help="Translation mode passed to the Taigi pinyin API (default: taigi_zh_tw_py).")
+    p.add_argument("--translation-api-url",
+                   default="http://tts001.bronci.com.tw:8802/run/predict",
+                   help="Taigi pinyin translation API URL (same default as GRPO training).")
     p.add_argument("--output-root", default="./outputs/indextts")
     p.add_argument("--index-tts-dir", default="index-tts", help="Path to index-tts repo root.")
     p.add_argument("--config", default="checkpoints/config.yaml", help="Relative to --index-tts-dir.")
@@ -92,9 +109,9 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--emotion-seed", type=int, default=None)
     p.add_argument(
         "--emotion-mode",
-        choices=["auto", "random", "va"],
-        default="auto",
-        help="auto uses VA-derived emotion when JSONL VA exists, otherwise random.",
+        choices=["auto", "random"],
+        default="random",
+        help="auto falls back to random when no emotion is pre-set.",
     )
     p.add_argument(
         "--disable-va-alpha",
@@ -112,14 +129,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--max-mel-tokens", type=int, default=1700)
     p.add_argument("--repetition-penalty", type=float, default=10.0)
     p.add_argument("--length-penalty", type=float, default=0.0)
-    p.add_argument("--interval-silence", type=int, default=200)
-    p.add_argument("--duration-seconds", type=float, default=10.0,
-                   help="Target duration (s) for generated audio; enables the engine's internal "
-                        "length planning (matches run_inference.sh). Use <=0 / None to disable.")
     p.add_argument("--model-name", default="indextts", help="Short model name recorded in manifest and filenames.")
     p.add_argument("--manifest", default=None, help="Path to manifest JSON. Defaults to <output-root>/manifest.json.")
-    p.add_argument("--trim-top-db", type=float, default=40.0, help="Silence trim threshold in dB (default: 40).")
-    p.add_argument("--trim-pad-ms", type=int, default=50, help="Padding kept on each side after trim (default: 50ms).")
     return p.parse_args()
 
 
@@ -162,24 +173,45 @@ def va_to_unit(va: Optional[tuple[float, float]]) -> Optional[tuple[float, float
     return (valence - 1.0) / 8.0, (arousal - 1.0) / 8.0
 
 
-def va_to_emotion(va: Optional[tuple[float, float]]) -> Optional[str]:
-    """Same thresholds as repo/train/dataset.py, mapped to this script's labels."""
-    if va is None:
-        return None
-    valence, arousal = va
-    if valence >= 5.8 and arousal >= 5.8:
-        return "happy"
-    if valence <= 4.0 and arousal >= 5.4:
-        return "angry"
-    if valence <= 4.2 and arousal <= 4.8:
-        return "sad"
-    if valence <= 4.8 and arousal >= 6.2:
-        return "fearful"
-    if valence <= 4.5:
-        return "disgusted"
-    if arousal >= 6.5:
-        return "surprised"
-    return "neutral"
+
+def build_tagged_text(text: str, quadruplets: List[JsonDict]) -> str:
+    """Wrap Aspect/Opinion spans in "..." emphasis quotes, matching training TaggedText.
+
+    Both Aspect and Opinion are tagged in place (skipping NULL/empty). When spans overlap
+    (nested), the longest wins and the shorter ones it covers are dropped. Spans not found
+    verbatim in `text` are skipped.
+    """
+    spans: List[str] = []
+    for item in quadruplets:
+        for key in ("Aspect", "Opinion"):
+            value = str(item.get(key) or "").strip()
+            if value and value != "NULL":
+                spans.append(value)
+
+    # Locate each span's leftmost occurrence in the text.
+    candidates: List[tuple[int, int]] = []
+    for span in spans:
+        start = text.find(span)
+        if start >= 0:
+            candidates.append((start, start + len(span)))
+
+    # Longest first; keep a span only if it does not overlap one already kept.
+    candidates.sort(key=lambda se: (-(se[1] - se[0]), se[0]))
+    kept: List[tuple[int, int]] = []
+    for start, end in candidates:
+        if all(end <= ks or start >= ke for ks, ke in kept):
+            kept.append((start, end))
+
+    # Insert quotes left to right.
+    kept.sort()
+    out: List[str] = []
+    prev = 0
+    for start, end in kept:
+        out.append(text[prev:start])
+        out.append('"' + text[start:end] + '"')
+        prev = end
+    out.append(text[prev:])
+    return "".join(out)
 
 
 def emphasis_targets(quadruplets: List[JsonDict]) -> List[JsonDict]:
@@ -200,12 +232,6 @@ def emphasis_targets(quadruplets: List[JsonDict]) -> List[JsonDict]:
         targets.append({"word": opinion, "aspect": aspect, "strength": strength, "va": item.get("VA")})
     return targets
 
-
-def message_text(item: JsonDict) -> str:
-    for message in reversed(list(item.get("messages") or [])):
-        if message.get("role") == "assistant" and message.get("content"):
-            return str(message["content"])
-    return ""
 
 
 def load_kaldi_tasks(path: Path, limit: Optional[int]) -> List[Task]:
@@ -244,13 +270,14 @@ def load_jsonl_tasks(path: Path, text_mode: str, limit: Optional[int]) -> List[T
         if limit is not None and len(tasks) >= limit:
             break
         item = json.loads(line)
-        text = str(item.get("Text") or message_text(item))
-        tagged_text = str(item.get("TaggedText") or text)
+        text = str(item.get("Text") or "")
         quadruplets = list(item.get("Quadruplet") or [])
+        raw_tagged = item.get("TaggedText")
+        # Use the provided TaggedText, otherwise build "..." emphasis quotes from Quadruplet.
+        tagged_text = str(raw_tagged) if raw_tagged else build_tagged_text(text, quadruplets)
         va = mean_va(quadruplets)
         va_01 = va_to_unit(va)
         generation_text = tagged_text if text_mode == "tagged" else text
-        emotion = va_to_emotion(va)
         tasks.append({
             "id": str(item.get("ID") or f"line-{idx}"),
             "text": text,
@@ -259,8 +286,6 @@ def load_jsonl_tasks(path: Path, text_mode: str, limit: Optional[int]) -> List[T
             "quadruplets": quadruplets,
             "va": va,
             "va_01": va_01,
-            "emotion": emotion,
-            "emotion_source": "va" if emotion is not None else None,
             "emphasis_targets": emphasis_targets(quadruplets),
         })
     if not tasks:
@@ -288,14 +313,6 @@ def apply_emotion_mode(tasks: List[Task], mode: str, rng: random.Random) -> None
         assign_random_emotions(tasks, rng)
         return
 
-    missing = [task for task in tasks if not task.get("emotion")]
-    if mode == "va" and missing:
-        missing_ids = ", ".join(str(task["id"]) for task in missing[:5])
-        raise ValueError(f"--emotion-mode va requires VA for every task; missing: {missing_ids}")
-
-    if missing:
-        assign_random_emotions(missing, rng)
-
     for task in tasks:
         emotion = task.get("emotion")
         if emotion not in EMOTION_VECTORS:
@@ -313,17 +330,17 @@ class VAAlphaMLP:
         self.model = nn.Sequential(
             nn.Linear(2, 16),
             nn.ReLU(),
-            nn.Linear(16, 1),
-            nn.Sigmoid(),
+            nn.Linear(16, 8),
+            nn.Tanh(),
         )
         stripped = {key.replace("net.", "", 1): value for key, value in state_dict.items()}
         self.model.load_state_dict(stripped)
         self.model.eval()
 
-    def __call__(self, va_01: tuple[float, float]) -> float:
+    def __call__(self, va_01: tuple[float, float]) -> List[float]:
         with self.torch.no_grad():
             va_t = self.torch.tensor(list(va_01), dtype=self.torch.float32)
-            return float(self.model(va_t).squeeze(-1).item())
+            return self.model(va_t).tolist()  # [8]
 
 
 def load_va_scaler(checkpoint_path: Path, disabled: bool) -> Optional[VaScaler]:
@@ -347,8 +364,9 @@ def load_va_scaler(checkpoint_path: Path, disabled: bool) -> Optional[VaScaler]:
     def scale(vec: List[float], va_01: Optional[tuple[float, float]]) -> tuple[List[float], Optional[float]]:
         if va_01 is None or not any(vec):
             return list(vec), None
-        alpha = alpha_mlp(va_01)
-        return [value * alpha for value in vec], alpha
+        b = alpha_mlp(va_01)  # [8] bias from Tanh MLP
+        weight_vector = [min(1.4, max(0.0, v + _VA_LAMBDA * bi)) for v, bi in zip(vec, b)]
+        return weight_vector, None
 
     return scale
 
@@ -371,6 +389,7 @@ def record_for_task(
         "text": task["text"],
         "tagged_text": task.get("tagged_text"),
         "generation_text": task.get("generation_text", task["text"]),
+        "synthesis_text": task.get("synthesis_text"),
         "emotion": task["emotion"],
         "emotion_source": task.get("emotion_source"),
         "emotion_vector": [round(value, 6) for value in emotion_vector],
@@ -407,6 +426,40 @@ def save_manifest(manifest_path: Path, records: list, model: str) -> None:
     manifest_path.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def load_translate_fn() -> Callable[..., str]:
+    """Reuse the exact translation helper GRPO training uses, so emphasis stays in sync."""
+    train_dir = Path(__file__).resolve().parent.parent / "train"
+    if str(train_dir) not in sys.path:
+        sys.path.insert(0, str(train_dir))
+    try:
+        from machine_translation import translate_text_with_requests
+    except Exception as exc:  # noqa: BLE001
+        raise RuntimeError(
+            f"--translate-tagged requires repo/train/machine_translation.py and `requests`: {exc}"
+        ) from exc
+    return translate_text_with_requests
+
+
+def translate_emphasis_text(
+    text: str,
+    translate_fn: Callable[..., str],
+    mode: str,
+    api_url: str,
+    cache: Dict[str, tuple[str, str]],
+) -> tuple[str, str]:
+    """Translate to Taigi pinyin, preserving "..." emphasis quotes (same cleanup as training).
+
+    Returns (raw, cleaned).
+    """
+    cached = cache.get(text)
+    if cached is not None:
+        return cached
+    raw = translate_fn(text, mode=mode, api_url=api_url)
+    cleaned = re.sub(r'"\s*(.*?)\s*"', r'"\1"', raw).strip()
+    cache[text] = (raw, cleaned)
+    return raw, cleaned
+
+
 def apply_seed(seed: Optional[int]) -> None:
     """Seed python / numpy / torch so sampling is reproducible (mirrors inference_script.py)."""
     if seed is None:
@@ -425,7 +478,8 @@ def apply_seed(seed: Optional[int]) -> None:
 
 def main() -> None:
     args = parse_args()
-    random.seed(args.seed)
+    # Fix the RNG once per run (python+numpy+torch) so a full run is reproducible.
+    apply_seed(args.seed)
 
     index_tts_dir = Path(args.index_tts_dir).expanduser().resolve()
     if not index_tts_dir.exists():
@@ -481,8 +535,6 @@ def main() -> None:
     va_scaler = load_va_scaler(gpt_ckpt, args.disable_va_alpha)
     if va_scaler is not None:
         print("[INFO] loaded va_alpha_mlp; VA will scale emotion vectors")
-    if trim_silence is None:
-        print(f"[WARN] trim_silence unavailable; generated wavs will not be trimmed: {TRIM_IMPORT_ERROR}")
     print("[INFO] model loaded, starting generation")
 
     generation_kwargs = {
@@ -494,6 +546,14 @@ def main() -> None:
         "repetition_penalty": args.repetition_penalty,
         "length_penalty": args.length_penalty,
     }
+
+    # Emphasis: translate tagged text -> Taigi pinyin (keeping "..." quotes), as in GRPO training.
+    translate_fn = None
+    translation_cache: Dict[str, tuple[str, str]] = {}
+    if args.translate_tagged:
+        translate_fn = load_translate_fn()
+        print(f"[INFO] emphasis translation enabled (mode={args.translation_mode}); "
+              f'tagged text -> Taigi pinyin with "..." quotes preserved')
 
     total_audio_sec = 0.0
     fail_count = 0
@@ -512,27 +572,41 @@ def main() -> None:
             va_msg = f"  va={task['va'][0]:.2f}#{task['va'][1]:.2f}"
         alpha_msg = f"  alpha={va_alpha:.3f}" if va_alpha is not None else ""
 
+        emphasis = task.get("emphasis_targets") or []
+        print(f"  [{i}/{len(tasks)}] {task['id']}  emotion={task['emotion']}{va_msg}")
+        if emphasis:
+            print(f"    emphasis: {[t['word'] for t in emphasis]}")
+        if va_scaler is not None:
+            print(f"    emo_vector: {[round(v, 3) for v in base_vec]}  →  {[round(v, 3) for v in vec]}")
+        else:
+            print(f"    emo_vector: {[round(v, 3) for v in vec]}")
+
         if out_path.exists():
             dur = get_wav_duration(out_path)
             total_audio_sec += dur
-            print(f"  [{i}/{len(tasks)}] {task['id']}  [SKIP existing]  {dur:.2f}s{va_msg}{alpha_msg}  cum={total_audio_sec:.1f}s")
+            print(f"    [SKIP existing]  {dur:.2f}s  cum={total_audio_sec:.1f}s")
             records.append(record_for_task(i, task, args.model_name, out_path.name, dur, vec, va_alpha, input_format))
             continue
 
-        # Reseed per utterance so each one starts from the same RNG state, regardless of
-        # batch position (matches batch_indexTTS.sh's per-process --seed; resume-independent).
-        apply_seed(args.seed)
-
+        # Pipeline: tagged text (with "..." quotes) -> translate to Taigi pinyin -> strip spaces.
+        gen_text = task.get("generation_text", task["text"])
+        print(f"    text: {gen_text}")
+        if translate_fn is not None:
+            raw, gen_text = translate_emphasis_text(
+                gen_text, translate_fn, args.translation_mode, args.translation_api_url, translation_cache,
+            )
+            print(f"    translated: {raw}")
+            print(f"    cleaned:    {gen_text}")
+        task["synthesis_text"] = gen_text
         success = False
         for attempt in range(1, args.retry_count + 2):
+            print(f"    infer attempt {attempt}...")
             try:
                 engine.infer(
                     spk_audio_prompt=str(speaker),
-                    text=task.get("generation_text", task["text"]),
+                    text=gen_text,
                     output_path=str(out_path),
                     emo_vector=vec,
-                    interval_silence=args.interval_silence,
-                    duration_seconds=args.duration_seconds,
                     max_text_tokens_per_sentence=args.max_text_tokens,
                     skip_normalizer=True,
                     **generation_kwargs,
@@ -544,19 +618,13 @@ def main() -> None:
 
         if not success or not out_path.exists():
             fail_count += 1
-            print(f"[SKIP] {task['id']}")
+            print(f"    [SKIP] failed after all attempts")
             records.append(record_for_task(i, task, args.model_name, out_path.name, None, vec, va_alpha, input_format))
             continue
 
-        if trim_silence is not None:
-            try:
-                trim_silence(out_path, out_path, top_db=args.trim_top_db, pad_ms=args.trim_pad_ms)
-            except Exception as exc:
-                print(f"[WARN] trim failed for {task['id']}: {exc}")
-
         dur = get_wav_duration(out_path)
         total_audio_sec += dur
-        print(f"  [{i}/{len(tasks)}] {task['id']}  {task['emotion']}  {dur:.2f}s{va_msg}{alpha_msg}  cum={total_audio_sec:.1f}s")
+        print(f"    done  {dur:.2f}s  cum={total_audio_sec:.1f}s")
         records.append(record_for_task(i, task, args.model_name, out_path.name, dur, vec, va_alpha, input_format))
 
     wall_elapsed = time.perf_counter() - wall_start
