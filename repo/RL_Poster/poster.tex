@@ -187,6 +187,22 @@
     \end{itemize}
   \end{block}
 
+% ----------------------------------
+% Evaluation metrics
+% ----------------------------------
+  \begin{block}{Evaluation Metrics}
+    \begin{itemize}
+      \item \textbf{SER:} emotion2vec recognition accuracy by target emotion and
+      corpus-wide mean.
+      \item \textbf{WER:} Taiwanese pinyin ASR evaluates intelligibility; the
+      IndexTTS2 rows use the same tone-insensitive scoring pipeline.
+      \item \textbf{SS:} ECAPA-TDNN speaker embeddings measure timbre retention
+      against the fixed Taiwanese reference speaker.
+      \item \textbf{MOS pilot:} 12 SARC members produced 600 ratings; CosyVoice2
+      reached 4.31 mean MOS, shifting the focus from quality to emotion recovery.
+    \end{itemize}
+  \end{block}
+
 \end{column}
 
 \separatorcolumn
@@ -261,7 +277,7 @@
 % Team and references
 % -------------------------------
   \begin{block}{Team and References}
-    \scriptsize
+    \small
     \textbf{Team:}
     Hao-Chun Hsieh -- project direction, formulation, and methodology;
     Pao-Hua Hsu -- audio generation, visualization, poster, and presentation;
