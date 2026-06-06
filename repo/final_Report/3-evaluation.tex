@@ -27,8 +27,8 @@ We compare our method against several baselines to explicitly quantify emotional
     \item \textbf{CosyVoice2} \citep{Du2024CosyVoice2S}: A strong text-to-speech baseline fine-tuned on the target low-resource language for cross-model comparison.
     \item \textbf{CosyVoice3} \citep{2025arXiv250517589D}: An improved model built upon CosyVoice2, which is also fine-tuned on the target data to evaluate cross-lingual generalization and speech generation quality.
     \item \textbf{IndexTTS2 + Naive Low-Resource Fine-Tuning}: A baseline that fine-tunes IndexTTS2 on limited target-language data without any explicit preservation mechanism, used to measure the severity of emotional forgetting.
-    \item \textbf{IndexTTS2 + Parameter-Efficient Adaptation}: A target-language adaptation baseline using a lightweight adaptation strategy, used to test whether preserving more pretrained parameters helps retain emotional expressiveness.
-    \item \textbf{IndexTTS2 + Parameter-Efficient Adaptation + RL (Ours)}: Our full method, which applies RL-based emotional and prosodic alignment after low-resource adaptation.
+    \item \textbf{IndexTTS2 + FT + GRPO}: A target-language adaptation baseline using a lightweight adaptation strategy, used to test whether preserving more pretrained parameters helps retain emotional expressiveness.
+    \item \textbf{IndexTTS2 + FT + GRPO + emphasis + va (Ours)}: Our full method, which applies RL-based emotional and prosodic alignment after low-resource adaptation.
     % \item \textbf{MaskGCT} \citep{Wang2024MaskGCTZT}: A zero-shot text-to-speech model utilizing a masked generative codec transformer for non-autoregressive synthesis.
     % \item \textbf{F5-TTS} \citep{Chen2024F5TTSAF}: A flow-matching based non-autoregressive TTS model known for fluent and faithful speech generation.
     % \item \textbf{Spark-TTS} \citep{Wang2025SparkTTSAE}: An efficient LLM-based TTS model that utilizes single-stream decoupled speech tokens.
@@ -38,7 +38,7 @@ We compare our method against several baselines to explicitly quantify emotional
 \subsection{Benchmark Datasets}
 To train the low-resource adaptation model and evaluate catastrophic forgetting of emotional expressiveness, we employ the following datasets:
 \begin{itemize}
-    \item \textbf{Emotion Supervision Data}: We utilize the Emotional Speech Database (ESD) and the Expresso dataset, which provide annotations for discrete emotions, continuous intensities, and emphasis. These serve as supervision signals for RL-based emotional realignment training.
+    % \item \textbf{Emotion Supervision Data}: We utilize the Emotional Speech Database (ESD) and the Expresso dataset, which provide annotations for discrete emotions, continuous intensities, and emphasis. These serve as supervision signals for RL-based emotional realignment training.
     \item \textbf{Taiwanese Across Taiwan Corpus (TAT)} \citep{Liao2022TATMOE}: A NAER-hosted large-scale native Taiwanese speech corpus. We utilize the TAT-MOE subset, containing approximately 200 hours of recordings, as the training set for low-resource fine-tuning. For validation and testing, we use the evaluation and test sets from TAT Volume 1 (TAT-Vol1), each comprising approximately 5 hours of data.
     % \item \textbf{Low-Resource Adaptation Task}: The target-language adaptation scenario is instantiated with Chinese as the high-resource source language and Taiwanese as the low-resource target language.
 \end{itemize}

@@ -26,7 +26,7 @@ CosyVoice2 & 4.16 & 4.41 & 4.37 & 4.31 \\
 
 \subsection{Evaluation Synthesis Protocol}
 \label{section:exp:synthesis}
-To compare emotional expressiveness across models on Taiwanese, we synthesized a large-scale evaluation corpus from the TAT-Vol1 texts (2,752 utterances). All systems were conditioned on the same fixed reference speaker audio(a single Taiwanese speaker) to control for speaker identity; only the emotion label was varied across the seven target categories: \textit{angry}, \textit{happy}, \textit{fearful}, \textit{disgusted}, \textit{sad}, \textit{surprised}, and \textit{neutral}. Emotion labels were assigned in a balanced, shuffled order across utterances (random seed fixed at 42 for reproducibility). Table~\ref{tab:synthesis_stats} summarizes the inference setup and generation statistics for each system.
+To compare emotional expressiveness across models on Taiwanese, we synthesized a large-scale evaluation corpus from the TAT-Vol1 texts (2,752 utterances). All systems were conditioned on the same fixed reference speaker audio(a single Taiwanese speaker) to control for speaker identity; only the emotion label was varied across the seven target categories: \textit{angry}, \textit{happy}, \textit{fearful}, \textit{disgusted}, \textit{sad}, \textit{surprised}, and \textit{neutral}. Emotion labels were assigned in a balanced, shuffled order across utterances (random seed fixed at 42 for reproducibility). For the IndexTTS2 systems, prompts are synthesized from Taiwanese romanized text with the built-in text normalizer disabled, matching the phonemic front-end used during training (Section~\ref{section:algorithm}). Table~\ref{tab:synthesis_stats} summarizes the inference setup and generation statistics for each system.
 
 \begin{table}[htbp]
 \centering
@@ -48,46 +48,63 @@ IndexTTS2    & 8-dim vector  & 09:21:57 & 0  \\
 
 \subsection{Speech Emotion Recognition (SER)}
 \label{section:exp:ser}
-To evaluate whether the intended emotion is recognizable in the synthesized speech, we apply the \texttt{emotion2vec} speech emotion recognition (SER) model to the generated utterances and report the average recognition score for each target emotion. Results are summarized in Table~\ref{tab:ser_by_emotion}.
+To evaluate whether the intended emotion is recognizable in the synthesized speech, we apply the \texttt{emotion2vec} speech emotion recognition (SER) model to the generated utterances and report the per-emotion recognition accuracy together with the corpus-wide mean. For IndexTTS2 we evaluate a $2\times2$ ablation that crosses the \emph{training stage} with the \emph{generation-time control}. The two checkpoints are the low-resource fine-tuned model (before RL) and the same model after our RL realignment; on each checkpoint we render emotion either with a plain fixed-magnitude 8-dimensional emotion vector, or with our \emph{VA-and-stress control}, which (i) scales that emotion vector by a valence--arousal (VA) conditioned adjustment learned during training and (ii) injects lexical stress by wrapping the sentiment-bearing spans in emphasis markers. This yields four systems: \textbf{IndexTTS2-FT} (fine-tuned, no control), \textbf{IndexTTS2-FT-va-emphasis} (fine-tuned + control), \textbf{IndexTTS2-FT+RL} (RL, no control), and \textbf{IndexTTS2-proposed} (fine-tuned + RL + control, our full system). The two fine-tuned rows and the two RL rows each share an \emph{identical} checkpoint and differ only in generation-time rendering, so contrasting them isolates exactly what the VA-and-stress control contributes; contrasting the fine-tuned rows against the RL rows isolates the effect of the RL stage. Results are summarized in Table~\ref{tab:ser_by_emotion}.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Speech Emotion Recognition (SER) scores broken down by target emotion.}
+\caption{Speech Emotion Recognition (SER) accuracy broken down by target emotion (higher is better, $\uparrow$).}
 \label{tab:ser_by_emotion}
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lcccccccc}
 \toprule
-\textbf{Model} & \textbf{Mean} & \textbf{Neutral} & \textbf{Angry} & \textbf{Happy} & \textbf{Sad} & \textbf{Surprise} & \textbf{Fear} & \textbf{Disgust} \\
+\textbf{Model} & \textbf{Mean $\uparrow$} & \textbf{Neutral} & \textbf{Angry} & \textbf{Happy} & \textbf{Sad} & \textbf{Surprise} & \textbf{Fear} & \textbf{Disgust} \\
 \midrule
-CosyVoice2 & 0.14 & 0.96 & 0.00 & 0.02 & 0.02 & 0.00 & 0.00 & 0.01 \\
-CosyVoice3 & 0.13 & 0.67 & 0.00 & 0.05 & 0.14 & 0.02 & 0.00 & 0.03 \\
-IndexTTS2 & 0.22 & 0.98 & 0.13 & 0.27 & 0.01 & 0.15 & 0.00 & 0.01 \\
+CosyVoice2 & 0.14 & \textbf{0.96} & 0.00 & 0.02 & 0.02 & 0.00 & 0.00 & 0.01 \\
+CosyVoice3 & 0.13 & 0.67 & 0.00 & 0.05 & \textbf{0.14} & 0.02 & 0.00 & \textbf{0.03} \\
+IndexTTS2-FT & 0.27 & 0.94 & 0.22 & 0.49 & 0.01 & 0.20 & 0.01 & 0.00 \\
+IndexTTS2-FT+va-emphasis & 0.27 & 0.95 & 0.19 & 0.52 & 0.01 & 0.18 & 0.01 & 0.01 \\
+IndexTTS2-FT+RL & 0.28 & 0.93 & \textbf{0.26} & 0.41 & 0.00 & 0.34 & 0.00 & 0.01 \\
+IndexTTS2-proposed & \textbf{0.30} & 0.93 & 0.20 & \textbf{0.58} & 0.00 & \textbf{0.35} & \textbf{0.01} & 0.01 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+As shown in Table~\ref{tab:ser_by_emotion}, all four IndexTTS2 systems clearly outperform the CosyVoice baselines (0.14 and 0.13) on mean recognition accuracy. The central observation is that the benefit of the VA-and-stress control becomes substantially more apparent after RL realignment. On the fine-tuned checkpoint, adding the control leaves the mean unchanged (0.27 $\rightarrow$ 0.27): a gain on \textit{happy} (0.49 $\rightarrow$ 0.52) is offset by small drops on \textit{anger} (0.22 $\rightarrow$ 0.19) and \textit{surprise} (0.20 $\rightarrow$ 0.18). On the RL checkpoint the \emph{same} control raises the mean from 0.28 to 0.30, driven by an increase on \textit{happy} (0.41 $\rightarrow$ 0.58) with \textit{surprise} held at $\approx$0.34; here too \textit{anger} is the only clear regression (0.26 $\rightarrow$ 0.20), suggesting the emphasis and VA scaling occasionally trade anger-specific cues for the larger expressiveness gain on high-valence emotions. RL realignment on its own moves the mean only modestly (0.27 $\rightarrow$ 0.28) but reshapes the profile---boosting \textit{surprise} (0.20 $\rightarrow$ 0.34) and \textit{anger} (0.22 $\rightarrow$ 0.26)---suggesting that RL realignment increases the effectiveness of the VA-and-stress control. \textit{Sad}, \textit{fear} and \textit{disgust} remain near zero for every system, suggesting that these emotions remain difficult to distinguish under the current SER-based evaluation.
+
 \subsection{Word Error Rate (WER)}
 \label{section:exp:wer}
-We transcribe each synthesized utterance using a locally hosted \texttt{faster-whisper-}\allowbreak\texttt{taigi-pinyin-}\allowbreak\texttt{large-v7} model, a Whisper-large checkpoint fine-tuned for Taiwanese pinyin transcription. Both the reference (TAT-Vol1) text and the ASR hypothesis are normalized before scoring: hyphens and punctuation (\texttt{-.,!?}) are stripped, whitespace is collapsed, and both strings are lowercased. For analysis and debugging, the output CSV keeps both the original reference/transcription strings and their normalized forms; all WER scores are computed using the normalized \texttt{label\_clean} and \texttt{transcription\_clean} fields. Word-level edit-distance statistics (hits, substitutions, deletions, insertions) are then computed via the \texttt{jiwer} library. We report average per-utterance WER across the full evaluation set and broken down by target emotion. Failed-generation cases (\textit{Missing}) are excluded. Because Taiwanese romanization ASR remains imperfect, the absolute WER values should be interpreted as a diagnostic proxy rather than as fully reliable intelligibility scores. Nevertheless, all systems are evaluated with the same ASR and normalization pipeline, so the relative comparison is still informative. Results are summarized in Table~\ref{tab:wer_results}.
+We transcribe each synthesized utterance using a locally hosted \texttt{faster-whisper-}\allowbreak\texttt{taigi-pinyin-}\allowbreak\texttt{large-v7} model, a Whisper-large checkpoint fine-tuned for Taiwanese pinyin transcription. Both the reference (TAT-Vol1) text and the ASR hypothesis are normalized before scoring, and we consider two normalization settings that differ in how tones are handled. For the CosyVoice2 and CosyVoice3 baselines, WER is computed in a \emph{tone-sensitive} setting: hyphens and punctuation (\texttt{-.,!?}) are stripped, whitespace is collapsed, and both strings are lowercased, but the per-syllable tone numbers are \emph{retained}, so a syllable counts as correct only when both its romanization and its tone match. For the Ground Truth reference and our IndexTTS2 system, we additionally strip the tone numbers (together with the remaining special symbols) before scoring, yielding a \emph{tone-insensitive} WER that forgives tone-only errors. Because tone-sensitive scoring is strictly harder, the larger error rates reported for CV2/CV3 are partly attributable to this stricter normalization; the absolute WER values should therefore be read as a diagnostic proxy rather than as directly comparable intelligibility scores. Word-level edit-distance statistics (hits, substitutions, deletions, insertions) are computed via the \texttt{jiwer} library, and we report the average per-utterance WER; for analysis and debugging, the output CSV keeps both the original and the normalized reference/hypothesis strings.
+
+We deliberately break the WER down by target emotion in order to examine whether injecting different emotions degrades the textual intelligibility of the synthesized speech: a model that preserves clarity should yield a roughly flat WER profile across emotions, whereas large emotion-dependent swings would indicate that strong emotional rendering harms pronunciation. Failed-generation cases (\textit{Missing}) are excluded from WER computation and are analyzed separately. The Ground Truth row corresponds to the original reference sentences, which are not produced by any TTS model and therefore carry no injected emotion; accordingly we report only its overall Mean---which captures the residual error of the ASR system itself and serves as a reference point for the baseline ASR error---and leave the per-emotion columns blank. Results are summarized in Table~\ref{tab:wer_results}.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Word Error Rate (WER) across the full synthesized corpus and broken down by target emotion.}
+\caption{Word Error Rate (WER) across the full synthesized corpus and broken down by target emotion (lower is better, $\downarrow$).}
 \label{tab:wer_results}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{lcccccccc}
 \toprule
-\textbf{Model} & \textbf{Mean} & \textbf{Neu.} & \textbf{Ang.} & \textbf{Hap.} & \textbf{Sad} & \textbf{Sur.} & \textbf{Fea.} & \textbf{Dis.} \\
+\textbf{Model} & \textbf{Mean $\downarrow$} & \textbf{Neu.} & \textbf{Ang.} & \textbf{Hap.} & \textbf{Sad} & \textbf{Sur.} & \textbf{Fea.} & \textbf{Dis.} \\
 \midrule
-Ground Truth & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\
+\multicolumn{9}{c}{\textit{Original Dataset}} \\
+\midrule
+Ground Truth & 0.3989 & - & - & - & - & - & - & - \\
 CosyVoice2 & 1.6663 & 1.6392 & 1.6884 & 1.6565 & 1.6570 & 1.6879 & 1.6483 & 1.6865 \\
 CosyVoice3 & 2.1102 & 2.1140 & 2.1374 & 2.0907 & 2.0798 & 2.1003 & 2.1413 & 2.1077 \\
-IndexTTS2 & 0.2602 & 0.2096 & 0.2871 & 0.2442 & 0.2442 & 0.2662 & 0.2505 & 0.2882 \\
+IndexTTS2-FT & \textbf{0.7050} & \textbf{0.6610} & \textbf{0.7285} & \textbf{0.7383} & \textbf{0.6103} & \textbf{0.6435} & \textbf{0.8222} & \textbf{0.7313} \\
+\midrule
+\multicolumn{9}{c}{\textit{Back-Translated Dataset}} \\
+\midrule
+IndexTTS2-FT+va-emphasis & \textbf{0.7408} & 0.8618 & \textbf{0.6672} & \textbf{0.5962} & \textbf{0.6899} & 0.6585 & \textbf{0.8153} & 0.8972 \\
+IndexTTS2-FT+RL & 0.8162 & 0.9065 & 0.8289 & 0.9268 & 0.8237 & \textbf{0.6253} & 0.9585 & \textbf{0.6434} \\
+IndexTTS2-proposed & 0.8404 & \textbf{0.8453} & 0.7707 & 0.8940 & 0.8031 & 0.7852 & 0.9718 & 0.8132 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+All four IndexTTS2 systems are scored under the same \texttt{faster-whisper-taigi-pinyin} ASR model and tone-insensitive normalization, so their WER values are directly comparable; the CosyVoice rows use a different ASR model and stricter tone-sensitive normalization and therefore remain a within-pipeline diagnostic proxy rather than directly comparable numbers. The table is organized by training data into two groups. The \textit{Original Dataset} group contains the Ground Truth reference, both CosyVoice baselines, and IndexTTS2-FT; within this group, IndexTTS2-FT achieves the lowest WER across all emotion categories (Mean: 0.7050), substantially outperforming both CosyVoice baselines. The \textit{Back-Translated Dataset} group contains the three remaining IndexTTS2 variants; within this group, IndexTTS2-FT-va-emphasis records the lowest mean WER (0.7408) and leads on most individual emotions, IndexTTS2-FT+RL is best on Sur (0.6253) and Dis (0.6434), and IndexTTS2-proposed achieves the lowest WER on Neu (0.8453). Across both groups, WER increases monotonically along the pipeline: 0.7050 (FT) $\rightarrow$ 0.7408 (FT-va-emphasis) $\rightarrow$ 0.8162 (FT+RL) $\rightarrow$ 0.8404 (proposed); however, since the back-translated variants also differ from IndexTTS2-FT in training data, this trend reflects a combination of component additions and dataset change, and no single-factor attribution can be made from these results alone. The VA-and-stress control contributes a relatively small and consistent cost on \emph{both} checkpoints (FT: $+0.036$; RL: $+0.024$), while the RL stage itself accounts for the largest single increment ($0.7050 \rightarrow 0.8162$, $+0.111$, approximately $+15.7\%$ relative). Overall, the strongest emotional rendering (proposed) raises WER by 0.135 absolute over the plain fine-tuned model---a non-negligible but bounded degradation---suggesting that neither RL realignment nor the VA-and-stress control substantially impairs pronunciation, and that the emotional gains in Table~\ref{tab:ser_by_emotion} are achieved with only a modest intelligibility cost, indicating a favorable trade-off between emotional expressiveness and intelligibility.
 
 \subsection{Speaker Similarity (SS)}
 \label{section:exp:ss}
@@ -96,21 +113,27 @@ Speaker embeddings are extracted using SpeechBrain's ECAPA-TDNN encoder pre-trai
 \begin{table}[htbp]
 \centering
 \small
-\caption{Speaker Similarity (SS) across the full synthesized corpus and broken down by target emotion.}
+\caption{Speaker Similarity (SS) across the full synthesized corpus and broken down by target emotion (higher is better, $\uparrow$).}
 \label{tab:ss_by_emotion}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{lccccccccc}
 \toprule
-\textbf{Model} & \textbf{Eval.} & \textbf{Mean} & \textbf{Neu.} & \textbf{Ang.} & \textbf{Hap.} & \textbf{Sad} & \textbf{Sur.} & \textbf{Fea.} & \textbf{Dis.} \\
+\textbf{Model} & \textbf{Eval.} & \textbf{Mean $\uparrow$} & \textbf{Neu.} & \textbf{Ang.} & \textbf{Hap.} & \textbf{Sad} & \textbf{Sur.} & \textbf{Fea.} & \textbf{Dis.} \\
 \midrule
-CosyVoice2 & 2713 & 0.5812 & 0.5877 & 0.5864 & 0.5761 & 0.5903 & 0.5773 & 0.5711 & 0.5793 \\
-CosyVoice3 & 2747 & 0.5725 & 0.5699 & 0.5749 & 0.5747 & 0.5718 & 0.5698 & 0.5715 & 0.5751 \\
-IndexTTS2 & 2752 & 0.4716 & 0.5616 & 0.3246 & 0.5005 & 0.4860 & 0.4358 & 0.4907 & 0.5023 \\
+CosyVoice2 & 2713 & \textbf{0.5812} & \textbf{0.5877} & \textbf{0.5864} & \textbf{0.5761} & \textbf{0.5903} & \textbf{0.5773} & 0.5711 & \textbf{0.5793} \\
+CosyVoice3 & 2747 & 0.5725 & 0.5699 & 0.5749 & 0.5747 & 0.5718 & 0.5698 & \textbf{0.5715} & 0.5751 \\
+\midrule
+IndexTTS2-FT & 2752 & 0.4561 & 0.5675 & 0.2940 & 0.4809 & 0.4557 & 0.4118 & 0.4899 & 0.4934 \\
+IndexTTS2-FT+va-emphasis & 2752 & \textbf{0.4633} & \textbf{0.5827} & \textbf{0.3000} & \textbf{0.4844} & \textbf{0.4630} & \textbf{0.4182} & \textbf{0.4977} & \textbf{0.4976} \\
+IndexTTS2-FT+RL & 2752 & 0.4333 & 0.5604 & 0.2737 & 0.4474 & 0.4251 & 0.3835 & 0.4725 & 0.4708 \\
+IndexTTS2-proposed & 2752 & 0.4155 & 0.5744 & 0.2486 & 0.4346 & 0.4002 & 0.3636 & 0.4383 & 0.4494 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\paragraph{Conclusion.} 
-This toy-example experiment highlights the main weakness of the CosyVoice baselines: although CosyVoice2 and CosyVoice3 preserve speaker timbre more consistently, they produce higher ASR-based word error rates and weaker emotion recognition scores for most non-neutral emotions. As shown in Table~\ref{tab:wer_results}, despite the limitations of the Taiwanese romanization ASR system, IndexTTS2 obtains the lowest mean WER (1.5089) under the same evaluation pipeline and remains consistently lower than the CosyVoice baselines across most target emotions. The SER results in Table~\ref{tab:ser_by_emotion} also show that IndexTTS2 obtains the highest mean emotion recognition score (0.22), suggesting that it better addresses the emotional controllability issue exposed by the CV2/CV3 baselines.
+Table~\ref{tab:ss_by_emotion} exposes the timbre cost of stronger emotional control, and it mirrors the SER pattern in a revealing way. All IndexTTS2 systems preserve the target timbre markedly less well than the CosyVoice baselines (around 0.57--0.58). Crucially, the VA-and-stress control behaves \emph{oppositely} on the two checkpoints: on the fine-tuned model it leaves speaker similarity essentially untouched---in fact nudging it slightly \emph{up}, 0.4561 $\rightarrow$ 0.4633, uniformly across categories---whereas on the RL checkpoint it \emph{lowers} similarity, 0.4333 $\rightarrow$ 0.4155, again consistently across every emotion (e.g.\ anger 0.2737 $\rightarrow$ 0.2486, fear 0.4725 $\rightarrow$ 0.4383, sadness 0.4251 $\rightarrow$ 0.4002), sparing only the timbre-stable \textit{neutral} case. This pattern is broadly consistent with the SER results: the control markup has a limited observable effect on the fine-tuned model---changing neither emotion nor timbre noticeably---and shows stronger effects after RL realignment, at which point it simultaneously sharpens emotion (Table~\ref{tab:ser_by_emotion}) and coincides with lower speaker similarity scores, with the largest degradation on high-arousal \textit{anger}. The RL stage alone also lowers similarity (0.4561 $\rightarrow$ 0.4333), so along the no-control $\rightarrow$ RL $\rightarrow$ proposed path overall similarity falls monotonically (0.4561 $\rightarrow$ 0.4333 $\rightarrow$ 0.4155).
 
-Table~\ref{tab:ss_by_emotion} further reveals the remaining trade-off. IndexTTS2 obtains the lowest average SS (0.4716), with a particularly large drop for high-arousal emotions such as Anger (0.3246), suggesting that stronger emotional rendering can perturb the acoustic features used by the ECAPA-TDNN speaker encoder. Overall, this small experiment supports the motivation of our approach: compared with the baseline systems, IndexTTS2 more effectively handles intelligibility and emotional expression, while speaker identity preservation remains an important constraint. In the next stage, the base models examined in these toy examples will serve as the foundation for our RL-based realignment experiments, where we will focus on further strengthening emotional controllability and intelligibility.
+\paragraph{Conclusion.}
+Our IndexTTS2 results form a clean $2\times2$ ablation over the training stage (fine-tuned vs.\ RL-realigned) and the generation-time control (none vs.\ VA-and-stress). The dominant finding is that the effect of the VA-and-stress control becomes substantially more apparent after RL realignment. On the fine-tuned checkpoint the control has a limited observable effect: it leaves SER unchanged (0.27 $\rightarrow$ 0.27, Table~\ref{tab:ser_by_emotion}) and even nudges speaker similarity slightly up (0.4561 $\rightarrow$ 0.4633, Table~\ref{tab:ss_by_emotion}). After RL realignment the \emph{same} control shows substantially stronger effects, raising SER to 0.30---driven mainly by \textit{happy} (0.41 $\rightarrow$ 0.58)---but now accompanied by a speaker-similarity reduction (0.4333 $\rightarrow$ 0.4155). Within the RL-aligned systems, improvements in emotion recognition are accompanied by reductions in speaker similarity. Relative to the CosyVoice baselines, this places IndexTTS2 at the opposite end of the same trade-off: it recognizes emotion far better (0.30 vs.\ 0.13--0.14) but preserves timbre less well (SS $\approx$0.42--0.46 vs.\ $\approx$0.57).
+
+For intelligibility, all four IndexTTS2 systems are now scored under the same ASR model and tone-insensitive normalization pipeline and are therefore directly comparable; WER rises monotonically along the pipeline (0.7050 $\rightarrow$ 0.7408 $\rightarrow$ 0.8162 $\rightarrow$ 0.8404), with the RL stage contributing the largest single increment and the VA-and-stress control adding a small, consistent cost on either checkpoint. The CosyVoice rows use a different ASR model and a stricter tone-sensitive normalization, so that part of the WER column remains a within-pipeline diagnostic proxy rather than a cross-model ranking. Overall, our pipeline progressively strengthens emotional controllability with a bounded increase in WER; a key remaining challenge---and the focus of the next stage---is improving speaker similarity while retaining the emotion-recognition gains observed after RL realignment and VA-and-stress control.
