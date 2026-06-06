@@ -2,7 +2,7 @@
 % This template comes from Anish Athalye (Unofficial University of Cambridge Poster Template).
 %
 % The Poster Template has been modified by Dr. Rahul Raoniar to fulfill
-% B.Tech/Master/Ph.D./PostDoc student's poster presentation requirements.
+% B.Tech/Master/Ph.D./PostDoc student poster presentation requirements.
 %-------------------------------------
 
 \documentclass[final,20pt]{beamer}
@@ -13,7 +13,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[orientation=portrait,size=a0,scale=1.02]{beamerposter}
+\usepackage[orientation=portrait,size=a0,scale=0.93]{beamerposter}
 \usetheme{gemini}
 \usecolortheme{nott}
 \usepackage{graphicx}
@@ -90,32 +90,31 @@
 % Abstract
 % ----------------------------------
   \begin{block}{Abstract}
-    We address emotional capability loss when an expressive text-to-speech
-    (TTS) model trained on a high-resource language is adapted to a
-    low-resource language. Using IndexTTS2 as the expressive base model, we
-    propose an RL-enhanced adaptation framework for preserving emotional
-    controllability, prosodic richness, and speech naturalness during transfer
-    from Chinese to Taiwanese. The goal is to retain the pretrained emotional
-    prior and realign it to limited target-language data.
+    We study emotional capability loss when an expressive TTS model trained on
+    high-resource languages is adapted to Taiwanese. Building on IndexTTS2, the
+    final system combines parameter-efficient adaptation, RL-based emotional
+    realignment, and \emph{VA-and-stress control}. The goal is to preserve the
+    pretrained expressive prior while improving emotion intensity, lexical
+    emphasis, and speech naturalness in Taiwanese.
   \end{block}
 
 % ----------------------------------
 % Motivation and objectives
 % ----------------------------------
-  \begin{alertblock}{Motivation and Objectives}
-    Expressive low-resource TTS is limited by a tension between pronunciation
-    adaptation and emotion preservation. Naive fine-tuning can improve
-    intelligibility while flattening rhythm, pauses, emphasis, and intensity.
+  \begin{alertblock}{Problem and Objectives}
+    Low-resource adaptation often improves pronunciation but weakens the
+    expressive behavior learned from high-resource speech. The final report
+    frames this as an emotion preservation and alignment problem.
 
     \begin{itemize}
-      \item \textbf{Emotional forgetting:} target-language fine-tuning can erase
-      expressive behavior learned from high-resource speech.
-      \item \textbf{Prosodic control loss:} adapted speech may stay intelligible
-      but lose natural emphasis and intensity control.
-      \item \textbf{Cross-lingual alignment:} emotional cues do not transfer
-      perfectly across languages with different phonology and rhythm.
-      \item \textbf{Objective:} recover controllable emotional expression in
-      Taiwanese TTS through RL-based realignment.
+      \item \textbf{Emotional forgetting:} limited Taiwanese fine-tuning can make
+      synthesized speech flatter and less controllable.
+      \item \textbf{Prosodic control loss:} rhythm, pauses, local stress, and
+      emotional intensity may degrade even when speech remains intelligible.
+      \item \textbf{Cross-lingual alignment:} emotion cues do not transfer
+      perfectly across Chinese, English, and Taiwanese phonology.
+      \item \textbf{Objective:} recover controllable emotional expression through
+      RL-based realignment and VA-conditioned lexical stress control.
     \end{itemize}
   \end{alertblock}
 
@@ -123,18 +122,21 @@
 % Method overview
 % ----------------------------------
   \begin{block}{Proposed Framework}
-    The method first adapts the expressive base model to Taiwanese
-    pronunciation, then applies RL to recover controllable emotion and prosody.
+    The final method follows a two-stage IndexTTS2 pipeline with an annotation
+    and phonemic text front-end placed between adaptation and evaluation.
 
     \input{images/figure1}
 
     \begin{itemize}
-      \item \textbf{Stage 1:} LoRA or adapter-based adaptation limits parameter
-      drift and reduces catastrophic forgetting.
-      \item \textbf{Stage 2:} GRPO optimizes the autoregressive
-      text-to-semantic policy with waveform-level rewards.
-      \item \textbf{Anchor:} a KL penalty preserves pronunciation, timbre, and
-      the adapted reference behavior.
+      \item \textbf{Stage 1:} LoRA or lightweight adapters learn Taiwanese
+      pronunciation while limiting catastrophic parameter drift.
+      \item \textbf{ASQP control:} Traditional Chinese aspect--sentiment
+      annotations provide Valence--Arousal signals and sentiment-bearing spans.
+      \item \textbf{Phonemic front-end:} Taiwanese text is rendered as
+      T\^ai-l\^o romanization with tone digits, while emphasis markers are kept
+      visible to the policy.
+      \item \textbf{Stage 2:} GRPO updates the autoregressive text-to-semantic
+      policy using waveform-level rewards.
     \end{itemize}
   \end{block}
 
@@ -142,48 +144,46 @@
 % Formulation
 % ----------------------------------
   \begin{block}{RL Formulation}
-    Semantic speech generation is formulated as an MDP over the IndexTTS2
-    text-to-semantic module.
+    Semantic speech generation is formulated as a fully observable MDP over the
+    IndexTTS2 autoregressive decoder.
 
     \begin{itemize}
-      \item \textbf{State:} input text, speaker timbre, duration constraint,
-      target emotion, and prior semantic tokens.
+      \item \textbf{State:} decoder hidden state conditioned on input text,
+      speaker embedding, duration, target emotion, and prior speech tokens.
       \item \textbf{Action:} the next discrete semantic speech token from
-      policy $\pi_\theta$.
-      \item \textbf{Reward:} a sequence-level score computed from the decoded
-      waveform.
+      policy $\pi_\theta(A_t|S_t)$.
+      \item \textbf{Reward:} a sequence-level score computed after decoding the
+      semantic tokens into a waveform.
     \end{itemize}
 
     \[
-      R = \lambda_1 R_{\mathrm{emo}}
+      R = \lambda_1 R_{\mathrm{emo\text{-}cls}}
         + \lambda_2 R_{\mathrm{intensity}}
         + \lambda_3 R_{\mathrm{emphasis}}
         + \lambda_4 R_{\mathrm{ASR}}
     \]
 
     \[
-      \max_\theta\; \mathbb{E}[R(s,a)]
+      \max_\theta\; \mathbb{E}_{s,a\sim\pi_\theta}\!\left[R(s,a)\right]
       - \beta\,\operatorname{KL}\!\left(\pi_\theta(\cdot|s)\,\|\,p_{\mathrm{adapt}}(\cdot|s)\right)
     \]
   \end{block}
 
 % ----------------------------------
-% Datasets and baselines
+% Data and synthesis
 % ----------------------------------
-  \begin{block}{Datasets and Baselines}
-    The experiment is designed to separate basic language adaptation from
-    emotional recovery, so each model is evaluated before adaptation, after
-    low-resource adaptation, and after RL realignment.
-
+  \begin{block}{Data and Synthesis Setup}
     \begin{itemize}
-      \item \textbf{Emotion supervision:} ESD and Expresso provide emotion
-      labels, intensity cues, and emphasis annotations.
-      \item \textbf{Taiwanese adaptation:} TAT\_MOE supports target-language
-      adaptation and evaluation with low-resource subsets of roughly 1--5 hours.
-      \item \textbf{Baselines:} high-resource IndexTTS2, naive fine-tuning,
-      parameter-efficient adaptation, our RL-enhanced model, and CosyVoice3.
-      \item \textbf{Core comparison:} Emotion Retention Gap and recovery ratio
-      measure how much expressiveness is lost and then restored.
+      \item \textbf{Training corpus:} TAT-MOE provides roughly 200 hours of
+      native Taiwanese speech for low-resource adaptation.
+      \item \textbf{Evaluation corpus:} TAT-Vol1 validation and test sets provide
+      about 5 hours each; the synthesis study uses 2,752 utterances.
+      \item \textbf{Emotion set:} each utterance is rendered with one of seven
+      target categories: angry, happy, fearful, disgusted, sad, surprised, and
+      neutral.
+      \item \textbf{Controlled speaker:} all systems share one fixed Taiwanese
+      reference speaker, producing 27:04:06 total synthesized audio with 44
+      failed generations across CosyVoice baselines.
     \end{itemize}
   \end{block}
 
@@ -202,62 +202,58 @@
     Reward models evaluate decoded speech rather than only token likelihood.
 
     \begin{itemize}
-      \item \textbf{Emotion category:} emotion2vec checks target emotion match.
-      \item \textbf{Global intensity:} VAD distance from a neutral centroid
-      encourages stronger affect.
-      \item \textbf{Local emphasis:} pitch and energy patterns measure stressed
-      words and expressive prosody.
-      \item \textbf{Content accuracy:} ASR transcription compares generated
-      speech with the input text.
+      \item \textbf{Emotion category:} emotion2vec checks whether the waveform
+      matches the requested emotion label.
+      \item \textbf{Global intensity:} distance from a neutral centroid in
+      Valence--Arousal--Dominance space encourages stronger affect.
+      \item \textbf{Local emphasis:} pitch and energy patterns reward stressed
+      words marked by the ASQP-derived control signal.
+      \item \textbf{Content accuracy:} a Taiwanese pinyin ASR model evaluates
+      whether emotional rendering preserves the input sentence.
     \end{itemize}
   \end{block}
 
 % -------------------------------
-% Evaluation
+% Results
 % -------------------------------
-  \begin{block}{Evaluation Protocol}
-    We evaluate intelligibility, speaker fidelity, emotional expressiveness,
-    and prosodic control across three stages: source model, adapted model, and
-    RL-optimized model.
-
-    \begin{itemize}
-      \item \textbf{Objective metrics:} WER from ASR, speaker similarity,
-      emotion similarity or accuracy, Emotion Retention Gap, and recovery ratio.
-      \item \textbf{Subjective MOS:} QMOS, SMOS, PMOS, and EMOS on a 1--5 scale
-      for quality, speaker identity, prosody, and emotion match.
-      \item \textbf{Fine-grained tests:} Emotion Intensity Test compares weak,
-      medium, and strong generations; Emphasis Accuracy Test checks perceived
-      stress locations.
-      \item \textbf{Trade-off check:} gains in emotion should not degrade WER,
-      speaker similarity, or naturalness.
-    \end{itemize}
-  \end{block}
-
-% -------------------------------
-% Preliminary results
-% -------------------------------
-  \begin{block}{Preliminary Taiwanese TTS Baseline}
-    A pilot MOS evaluation with 12 SARC laboratory members used 20 sentences for
-    intelligibility and naturalness plus 10 sentences for voice similarity,
-    yielding 600 subjective rating samples.
+  \begin{block}{Final Report Results}
+    The final report evaluates emotion recognizability, intelligibility, and
+    speaker fidelity across CosyVoice baselines and IndexTTS2 ablations.
 
     \input{tables/table1}
 
-    CosyVoice2 reaches a mean MOS of 4.31, motivating a shift from basic quality
-    toward emotional preservation and recovery.
+    \begin{itemize}
+      \item \textbf{Emotion recognition:} all IndexTTS2 variants outperform
+      CosyVoice2/3 in mean SER accuracy; the full proposed system is highest
+      at 0.30.
+      \item \textbf{VA-and-stress after RL:} control has little effect before RL
+      (0.27 $\rightarrow$ 0.27 SER), but improves the RL checkpoint
+      (0.28 $\rightarrow$ 0.30), driven by happy emotion accuracy
+      (0.41 $\rightarrow$ 0.58).
+      \item \textbf{Intelligibility trade-off:} WER rises from 0.705 to 0.840
+      from plain fine-tuning to the full system, a bounded cost for stronger
+      emotional rendering.
+      \item \textbf{Speaker fidelity:} stronger emotion control lowers speaker
+      similarity, especially after RL, making timbre preservation the main next
+      challenge.
+    \end{itemize}
   \end{block}
 
 % -------------------------------
-% Contributions
+% Diagnostic findings
 % -------------------------------
-  \begin{exampleblock}{Expected Contributions}
+  \begin{exampleblock}{Key Findings and Next Step}
     \begin{itemize}
-      \item A low-resource emotional TTS adaptation framework separating
-      pronunciation transfer from expressive realignment.
-      \item A multi-objective reward design for emotion, intensity, emphasis,
-      and semantic intelligibility.
-      \item An evaluation protocol for emotional forgetting, recovery ratio,
-      speaker similarity, and WER trade-offs.
+      \item IndexTTS2 moves to the opposite side of the baseline trade-off:
+      better emotion recognition than CosyVoice2/3, but weaker speaker
+      similarity.
+      \item RL realignment reshapes the emotional profile, improving surprise
+      and making VA-and-stress control more effective.
+      \item Sad, fear, and disgust remain difficult under the current SER-based
+      evaluation, suggesting that reward models and data balance need further
+      refinement.
+      \item Next stage: improve speaker similarity while retaining the emotion
+      gains from RL realignment and VA-and-stress control.
     \end{itemize}
   \end{exampleblock}
 
@@ -267,17 +263,14 @@
   \begin{block}{Team and References}
     \scriptsize
     \textbf{Team:}
-    Hao-Chun Hsieh -- formulation and methodology;
-    Pao-Hua Hsu -- documentation, visualization, poster, and presentation;
-    Nien-Tse Wu -- data, evaluation, implementation, and tuning.
+    Hao-Chun Hsieh -- project direction, formulation, and methodology;
+    Pao-Hua Hsu -- audio generation, visualization, poster, and presentation;
+    Nien-Tse Wu -- implementation, dataset curation, evaluation, and tuning.
 
     \vspace{0.4em}
     \textbf{References:}
-    Zhou et al. IndexTTS2, 2025.\quad
-    Li et al. EMORL-TTS, 2025.\quad
-    Ma et al. emotion2vec, 2023.\quad
-    Liao. TAT\_MOE Corpus, 2022.\quad
-    Du et al. CosyVoice2, 2024.
+    IndexTTS2; EMORL-TTS; emotion2vec; TAT-MOE/TAT-Vol1; CosyVoice2/3;
+    FunASR; Whisper; ASQP/SemEval-2026 Task 3.
   \end{block}
 
 \end{column}

@@ -1,14 +1,23 @@
 \begin{table}
     \centering
-    \caption{Preliminary subjective evaluation (MOS) on Taiwanese TTS.}
+    \caption{Corpus-wide final report metrics. SER and SS are higher-is-better; WER is lower-is-better.}
+    \scriptsize
     \resizebox{\linewidth}{!}{%
-      \begin{tabular}{lcccc}
+      \begin{tabular}{lccc}
         \toprule
-        \textbf{Model} & \textbf{Similarity MOS $\uparrow$} & \textbf{Intelligibility MOS $\uparrow$} & \textbf{Naturalness MOS $\uparrow$} & \textbf{Mean $\uparrow$} \\
+        \textbf{Model} & \textbf{SER $\uparrow$} & \textbf{WER $\downarrow$} & \textbf{SS $\uparrow$} \\
         \midrule
-        CosyVoice2 & 4.16 & 4.41 & 4.37 & 4.31 \\
+        CosyVoice2 & 0.14 & 1.666$^{\dagger}$ & \textbf{0.581} \\
+        CosyVoice3 & 0.13 & 2.110$^{\dagger}$ & 0.573 \\
+        \midrule
+        IndexTTS2-FT & 0.27 & \textbf{0.705} & 0.456 \\
+        IndexTTS2-FT+VA/stress & 0.27 & 0.741 & 0.463 \\
+        IndexTTS2-FT+RL & 0.28 & 0.816 & 0.433 \\
+        \textbf{IndexTTS2-proposed} & \textbf{0.30} & 0.840 & 0.416 \\
         \bottomrule
       \end{tabular}%
     }
-    \label{tab:taiwanese-mos}
+    \vspace{0.25em}
+    {\scriptsize $^{\dagger}$CosyVoice WER is a tone-sensitive diagnostic score and is not directly comparable to the IndexTTS2 rows.}
+    \label{tab:final-report-metrics}
 \end{table}

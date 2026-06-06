@@ -56,6 +56,9 @@ repo/train/models/
 *.blg
 *.fdb_latexmk
 *.fls
+*.nav
 *.out
+*.snm
 *.synctex.gz
 *.synctex(busy)
+*.toc

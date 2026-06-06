@@ -1,27 +1,29 @@
 \begin{figure}
     \centering
-    \begin{adjustbox}{width=0.94\linewidth,max height=0.26\textheight, center}
+    \begin{adjustbox}{width=0.94\linewidth,max height=0.23\textheight, center}
         \begin{tikzpicture}[
-            node distance=1.25cm,
-            posterstep/.style={rectangle, rounded corners=8pt, draw=black, very thick, fill=white, align=center, text width=12.2cm, minimum height=2.0cm},
-            reward/.style={rectangle, draw=black, very thick, fill=white, align=center, text width=8.8cm, minimum height=1.7cm},
+            node distance=1.08cm,
+            posterstep/.style={rectangle, rounded corners=8pt, draw=black, very thick, fill=white, align=center, text width=12.0cm, minimum height=1.75cm},
+            control/.style={rectangle, draw=black, very thick, fill=white, align=center, text width=8.6cm, minimum height=1.55cm},
             connector/.style={ultra thick,->,>=stealth}
         ]
-            \node[posterstep] (base) {\textbf{High-resource expressive IndexTTS2}\\Chinese expressive prior, speaker timbre, controllable emotion};
-            \node[posterstep, below=of base] (adapt) {\textbf{Parameter-efficient Taiwanese adaptation}\\LoRA/adapters learn target-language pronunciation while limiting parameter drift};
-            \node[posterstep, below=of adapt] (policy) {\textbf{GRPO emotional realignment}\\Text-to-semantic policy samples candidate semantic token sequences};
-            \node[posterstep, below=of policy] (tts) {\textbf{Emotion-preserving Taiwanese TTS}\\Decoded waveform keeps content accuracy, timbre, intensity, and emphasis};
+            \node[posterstep] (base) {\textbf{Expressive IndexTTS2 prior}\\Chinese/English source languages with controllable emotion};
+            \node[posterstep, below=of base] (adapt) {\textbf{Stage 1: Taiwanese adaptation}\\LoRA/adapters learn pronunciation while limiting forgetting};
+            \node[posterstep, below=of adapt] (frontend) {\textbf{ASQP + T\^ai-l\^o front-end}\\VA signals, tone-number romanization, and lexical stress markers};
+            \node[posterstep, below=of frontend] (policy) {\textbf{Stage 2: GRPO realignment}\\Text-to-semantic policy samples candidate semantic token sequences};
+            \node[posterstep, below=of policy] (tts) {\textbf{Emotion-controlled Taiwanese TTS}\\Waveform preserves content while recovering emotion and emphasis};
 
-            \node[reward, right=2.4cm of policy, yshift=1.1cm] (emo) {Emotion category\\and intensity rewards};
-            \node[reward, right=2.4cm of policy, yshift=-1.1cm] (prosody) {Local emphasis\\and ASR rewards};
+            \node[control, right=2.2cm of policy, yshift=1.05cm] (emo) {Emotion category\\and VAD intensity rewards};
+            \node[control, right=2.2cm of policy, yshift=-1.05cm] (prosody) {Local emphasis\\and ASR content rewards};
 
             \draw[connector] (base) -- (adapt);
-            \draw[connector] (adapt) -- (policy);
+            \draw[connector] (adapt) -- (frontend);
+            \draw[connector] (frontend) -- (policy);
             \draw[connector] (policy) -- (tts);
             \draw[connector] (emo.west) -- (policy.east);
             \draw[connector] (prosody.west) -- (policy.east);
         \end{tikzpicture}
     \end{adjustbox}
-    \caption{Two-stage adaptation and RL realignment pipeline.}
+    \caption{Final-report pipeline: low-resource adaptation followed by ASQP-conditioned RL realignment.}
     \label{fig:method-flow}
 \end{figure}
