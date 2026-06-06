@@ -1,16 +1,16 @@
 # Fdb version 4
-["bibtex proposal"] 1780387063.84616 "proposal.aux" "proposal.bbl" "proposal" 1780387064.16319 0
-  "./reference.bib" 1780058034.37054 9511 f51b3af16fe6bd74b020066f315f1c28 ""
+["bibtex proposal"] 1780750337.38756 "proposal.aux" "proposal.bbl" "proposal" 1780751052.2159 0
+  "./reference.bib" 1780721933.27693 10245 dd8cdf7a38d00a417de195414bf93afd ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/natbib/unsrtnat.bst" 1233624470 24550 a41a6405f4de768c43e871d9fbce2bc8 ""
-  "proposal.aux" 1780387064.11822 9423 cbe6acee83c61be2a6fb55c248f5b10d "pdflatex"
+  "proposal.aux" 1780751052.17396 10240 30d713bfb7eba96cbb84c0e473b59b95 "pdflatex"
   (generated)
   "proposal.bbl"
   "proposal.blg"
   (rewritten before read)
-["pdflatex"] 1780387063.85762 "/srv/RL_project/repo/final_Report/proposal.tex" "proposal.pdf" "proposal" 1780387064.1633 0
+["pdflatex"] 1780751051.90222 "/srv/RL_project/repo/final_Report/proposal.tex" "proposal.pdf" "proposal" 1780751052.21604 0
   "/etc/texmf/web2c/texmf.cnf" 1773062606.20639 475 c0e671620eb5563b2130f56340a5fde8 ""
-  "/home/ben/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0900.600pk" 1775408140.60169 17492 e20cec2ef2b7d2f4291db5a42326e758 ""
-  "/home/ben/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk" 1775407923.99782 20008 6ece83d4fd6ae28af468a5439bd404ff ""
+  "/home/black0000/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0900.600pk" 1775409479.32989 17492 724fa749e3c1052f3c7b7dd699d03a6f ""
+  "/home/black0000/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk" 1774977381.87029 20008 39acb11547aba4067ad43ff172cd58b4 ""
   "/srv/RL_project/repo/final_Report/proposal.tex" 1780058034.37054 2591 da22448d055c5484c999d3da03822bf9 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -44,6 +44,7 @@
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb" 1248133631 32762 224316ccc9ad3ca0423a14971cfa7fc1 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb" 1248133631 32569 5e5ddc8df908dea60932f3c484a54c0d ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb" 1248133631 32716 08e384dc442464e7285e891af9f45947 ""
+  "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb" 1248133631 32442 c975af247b6702f7ca0c299af3616b80 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb" 1248133631 34694 ad62b13721ee8eda1dcc8993c8bd7041 ""
   "/usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb" 1136849748 44729 811d6c62865936705a31c797a1d5dada ""
   "/usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb" 1136849748 46026 6dab18b61c907687b520c72847215a68 ""
@@ -133,17 +134,17 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1707919699 40399 f2c302f7d2af602abb742093540a5834 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1773331718.37267 230484 b5ecf1e2279bd656c2c0037689af4d45 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1773331724 6898742 f29cf9cfc934ae712488d4bfc3a9de41 ""
-  "1-overview.tex" 1780058034.34854 5021 e73e1134a50d9225a3bbb6e86d4a4d79 ""
+  "1-overview.tex" 1780750893.47562 5393 3e0973c70a188a6613adaa107f2e352e ""
   "2-formulation.tex" 1780058034.34954 2289 65604d6a31e9d43d801f64ef5820753a ""
-  "3-evaluation.tex" 1780058034.35054 5641 884307d85dac0568f37f3484d757eafe ""
-  "4-method.tex" 1780058034.35054 4979 d36375c33b1767e3fc8b79416b047d65 ""
-  "5-exp.tex" 1780387063.26523 10075 2d3f9ead63f45ce09c0d8f6113c9de13 ""
+  "3-evaluation.tex" 1780552777.19667 5612 cce78a5564977e14442dff8395917f90 ""
+  "4-method.tex" 1780721942.36598 7438 46222762fee1a9ecbc1f96958d48696e ""
+  "5-exp.tex" 1780751051.70296 19618 68d0461bf728338766d85aa4948775f0 ""
   "6-contribution.tex" 1780058034.35154 758 4d870a2d453b58d3c8ef7460686c47b3 ""
   "asset/architecture.pdf" 1780143478.74352 2451492 f2fba2fdcb7732840179df0f597761d4 ""
   "neurips_2020.sty" 1780058034.36554 11309 0a12e5896af9b3e64d2bb3e796c5eb0a ""
-  "proposal.aux" 1780387064.11822 9423 cbe6acee83c61be2a6fb55c248f5b10d "pdflatex"
-  "proposal.bbl" 1780387063.85522 5464 245882914418152776fad76c762bc45a "bibtex proposal"
-  "proposal.out" 1780387064.11922 3651 bb9c0870b16f87adae22b12d62a6c28d "pdflatex"
+  "proposal.aux" 1780751052.17396 10240 30d713bfb7eba96cbb84c0e473b59b95 "pdflatex"
+  "proposal.bbl" 1780750337.395 6125 489656735c9aec108980c9cf5d3bb96a "bibtex proposal"
+  "proposal.out" 1780751052.17396 4014 66c9f44c0ff4d5e7e2fa20c64f85905e "pdflatex"
   "proposal.tex" 1780058034.37054 2591 da22448d055c5484c999d3da03822bf9 ""
   (generated)
   "proposal.aux"

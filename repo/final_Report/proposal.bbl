@@ -1,4 +1,4 @@
-\begin{thebibliography}{10}
+\begin{thebibliography}{12}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -65,5 +65,15 @@ Zhihao Du, Yuxuan Wang, Qian Chen, Xian Shi, Xiang Lv, Tianyu Zhao, Zhifu Gao, Y
 Y.-F. Liao.
 \newblock Tat\_moe corpus [2022].
 \newblock Available online at https://tggl.naer.edu.tw, 2022.
+
+\bibitem[DimABSA(2026)]{DimABSA2026}
+DimABSA.
+\newblock {DimABSA} 2026: Dimensional aspect-based sentiment analysis, {SemEval}-2026 task 3.
+\newblock \url{https://github.com/DimABSA/DimABSA2026}, 2026.
+
+\bibitem[Hsieh et~al.(2026)Hsieh, Wu, and Liao]{Hsieh2026NYCU}
+Hao-Chun Hsieh, Cheng-En Wu, and Yuan-Fu Liao.
+\newblock {NYCU} speech lab at {SemEval}-2026 task 3: Heterogeneous model ensemble with adaptive weighted voting for dimensional aspect sentiment quadruplet extraction.
+\newblock In \emph{Proceedings of the 20th International Workshop on Semantic Evaluation (SemEval-2026)}, San Diego, California, 2026. Association for Computational Linguistics.
 
 \end{thebibliography}
