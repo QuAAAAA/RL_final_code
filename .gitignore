@@ -66,3 +66,4 @@ repo/train/models/
 *.json
 *.csv
 /wandb/
+/outputs/
