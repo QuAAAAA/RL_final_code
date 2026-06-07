@@ -62,3 +62,6 @@ repo/train/models/
 *.synctex.gz
 *.synctex(busy)
 *.toc
+
+*.json
+*.csv

@@ -1,17 +1,17 @@
 # Fdb version 4
-["bibtex proposal"] 1780750337.38756 "proposal.aux" "proposal.bbl" "proposal" 1780751052.2159 0
+["bibtex proposal"] 1780750337.38756 "proposal.aux" "proposal.bbl" "proposal" 1780841632.28538 0
   "./reference.bib" 1780721933.27693 10245 dd8cdf7a38d00a417de195414bf93afd ""
   "/usr/share/texlive/texmf-dist/bibtex/bst/natbib/unsrtnat.bst" 1233624470 24550 a41a6405f4de768c43e871d9fbce2bc8 ""
-  "proposal.aux" 1780751052.17396 10240 30d713bfb7eba96cbb84c0e473b59b95 "pdflatex"
+  "proposal.aux" 1780841632.24065 10240 30d713bfb7eba96cbb84c0e473b59b95 "pdflatex"
   (generated)
   "proposal.bbl"
   "proposal.blg"
   (rewritten before read)
-["pdflatex"] 1780751051.90222 "/srv/RL_project/repo/final_Report/proposal.tex" "proposal.pdf" "proposal" 1780751052.21604 0
+["pdflatex"] 1780841631.96779 "/srv/RL_project/repo/final_Report/proposal.tex" "proposal.pdf" "proposal" 1780841632.28549 0
   "/etc/texmf/web2c/texmf.cnf" 1773062606.20639 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/home/black0000/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0900.600pk" 1775409479.32989 17492 724fa749e3c1052f3c7b7dd699d03a6f ""
   "/home/black0000/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk" 1774977381.87029 20008 39acb11547aba4067ad43ff172cd58b4 ""
-  "/srv/RL_project/repo/final_Report/proposal.tex" 1780058034.37054 2591 da22448d055c5484c999d3da03822bf9 ""
+  "/srv/RL_project/repo/final_Report/proposal.tex" 1780841618.09372 2537 ff988ca8349c7b00306ac2d1cf2203e3 ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb8r.tfm" 1136768653 4524 6bce29db5bc272ba5f332261583fee9c ""
@@ -142,10 +142,10 @@
   "6-contribution.tex" 1780058034.35154 758 4d870a2d453b58d3c8ef7460686c47b3 ""
   "asset/architecture.pdf" 1780143478.74352 2451492 f2fba2fdcb7732840179df0f597761d4 ""
   "neurips_2020.sty" 1780058034.36554 11309 0a12e5896af9b3e64d2bb3e796c5eb0a ""
-  "proposal.aux" 1780751052.17396 10240 30d713bfb7eba96cbb84c0e473b59b95 "pdflatex"
+  "proposal.aux" 1780841632.24065 10240 30d713bfb7eba96cbb84c0e473b59b95 "pdflatex"
   "proposal.bbl" 1780750337.395 6125 489656735c9aec108980c9cf5d3bb96a "bibtex proposal"
-  "proposal.out" 1780751052.17396 4014 66c9f44c0ff4d5e7e2fa20c64f85905e "pdflatex"
-  "proposal.tex" 1780058034.37054 2591 da22448d055c5484c999d3da03822bf9 ""
+  "proposal.out" 1780841632.24065 4014 66c9f44c0ff4d5e7e2fa20c64f85905e "pdflatex"
+  "proposal.tex" 1780841618.09372 2537 ff988ca8349c7b00306ac2d1cf2203e3 ""
   (generated)
   "proposal.aux"
   "proposal.log"

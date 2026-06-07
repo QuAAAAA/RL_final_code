@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.3.12)  6 JUN 2026 13:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.3.12)  7 JUN 2026 14:13
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -550,15 +550,15 @@ Package rerunfilecheck Info: File `proposal.out' has not changed.
 (rerunfilecheck)             Checksum: 66C9F44C0FF4D5E7E2FA20C64F85905E;4014.
  ) 
 Here is how much of TeX's memory you used:
- 16044 strings out of 475662
- 259765 string characters out of 5784442
+ 16041 strings out of 475662
+ 259738 string characters out of 5784442
  1947975 words of memory out of 5000000
  37577 multiletter control sequences out of 15000+600000
- 609588 words of font info for 288 fonts, out of 8000000 for 9000
+ 609461 words of font info for 286 fonts, out of 8000000 for 9000
  264 hyphenation exceptions out of 8191
  75i,10n,79p,2286b,731s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </home/black0000/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt0900.600pk> </home/black0000/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on proposal.pdf (10 pages, 2627563 bytes).
+Output written on proposal.pdf (10 pages, 2627502 bytes).
 PDF statistics:
  677 PDF objects out of 1000 (max. 8388607)
  415 compressed objects within 5 object streams
